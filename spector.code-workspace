@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"typescript.preferences.renameShorthandProperties": false,
+		"typescript.suggest.autoImports": true
+	}
+}
