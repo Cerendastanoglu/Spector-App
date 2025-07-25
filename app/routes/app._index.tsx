@@ -1410,13 +1410,31 @@ export default function Index() {
   }
 
   return (
-    <Page>
-      <ClientErrorFilter />
-      <TitleBar title="Spector" />
+    <>
+      <style>
+        {`
+          .oos-grid-emphasis {
+            border: 3px solid #dc2626 !important;
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.3) !important;
+            transform: scale(1.02) !important;
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%) !important;
+          }
+          
+          .low-stock-grid-emphasis {
+            border: 3px solid #f59e0b !important;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3) !important;
+            transform: scale(1.02) !important;
+            background: linear-gradient(135deg, #fffbeb 0%, #fcd34d 100%) !important;
+          }
+        `}
+      </style>
+      <Page>
+        <ClientErrorFilter />
+        <TitleBar title="Spector" />
       
       {/* Header with Logo and Title */}
       <div style={{ 
-        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+        background: '#f8fafc',
         padding: '2rem',
         marginBottom: '1.5rem',
         borderRadius: '8px',
@@ -1508,18 +1526,52 @@ export default function Index() {
             gridTemplateColumns: 'repeat(4, 1fr)',
             gap: '1rem',
             padding: '1rem',
-            background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+            background: '#f8fafc',
             borderRadius: '10px',
             border: '1px solid #e2e8f0'
           }}>
-            {/* Out of Stock - Critical */}
-            <div style={{
-              textAlign: 'center',
-              padding: '0.75rem',
-              background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
-              borderRadius: '8px',
-              border: '1px solid #fecaca'
-            }}>
+            {/* Out of Stock - Critical - Clickable */}
+            <div 
+              style={{
+                textAlign: 'center',
+                padding: '0.75rem',
+                background: '#fef2f2',
+                borderRadius: '8px',
+                border: '1px solid #fecaca',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onClick={() => {
+                const outOfStockGrid = document.getElementById('out-of-stock-grid');
+                if (outOfStockGrid) {
+                  // Scroll to the red OOS grid section specifically
+                  outOfStockGrid.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center',
+                    inline: 'nearest'
+                  });
+                  
+                  // Add visual emphasis with CSS class to the grid container
+                  outOfStockGrid.classList.add('oos-grid-emphasis');
+                  
+                  // Remove emphasis after animation completes
+                  setTimeout(() => {
+                    outOfStockGrid.classList.remove('oos-grid-emphasis');
+                  }, 2000);
+                }
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#dc2626';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.2)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#fecaca';
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+              title="Click to view out of stock products"
+            >
               <Text as="p" variant="headingLg" fontWeight="bold" tone="critical">
                 {zeroStockProducts.length}
               </Text>
@@ -1528,14 +1580,48 @@ export default function Index() {
               </Text>
             </div>
             
-            {/* Low Stock - Warning */}
-            <div style={{
-              textAlign: 'center',
-              padding: '0.75rem',
-              background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
-              borderRadius: '8px',
-              border: '1px solid #fcd34d'
-            }}>
+            {/* Low Stock - Warning - Clickable */}
+            <div 
+              style={{
+                textAlign: 'center',
+                padding: '0.75rem',
+                background: '#fffbeb',
+                borderRadius: '8px',
+                border: '1px solid #fcd34d',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onClick={() => {
+                const lowStockGrid = document.getElementById('low-stock-grid');
+                if (lowStockGrid) {
+                  // Scroll to the yellow low stock grid section specifically
+                  lowStockGrid.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center',
+                    inline: 'nearest'
+                  });
+                  
+                  // Add visual emphasis with CSS class to the grid container
+                  lowStockGrid.classList.add('low-stock-grid-emphasis');
+                  
+                  // Remove emphasis after animation completes
+                  setTimeout(() => {
+                    lowStockGrid.classList.remove('low-stock-grid-emphasis');
+                  }, 2000);
+                }
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#f59e0b';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.2)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#fcd34d';
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+              title="Click to view low stock products"
+            >
               <Text as="p" variant="headingLg" fontWeight="bold" tone="critical">
                 {lowStockProducts.length}
               </Text>
@@ -1548,7 +1634,7 @@ export default function Index() {
             <div style={{
               textAlign: 'center',
               padding: '0.75rem',
-              background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+              background: '#f0fdf4',
               borderRadius: '8px',
               border: '1px solid #86efac'
             }}>
@@ -1564,7 +1650,7 @@ export default function Index() {
             <div style={{
               textAlign: 'center',
               padding: '0.75rem',
-              background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+              background: '#eff6ff',
               borderRadius: '8px',
               border: '1px solid #93c5fd'
             }}>
@@ -1578,366 +1664,8 @@ export default function Index() {
           </div>
         </div>
         
-        {/* Enhanced Threshold Control with Email Alerts - Collapsible Section */}
-        <div style={{
-          marginTop: '1.5rem',
-          paddingTop: '1.5rem',
-          borderTop: '1px solid rgba(226, 232, 240, 0.6)'
-        }}>
-          <BlockStack gap="300">
-            {/* Header Section with Toggle */}
-            <InlineStack align="space-between" blockAlign="center">
-              <InlineStack gap="300" blockAlign="center">
-                <Icon source={AlertTriangleIcon} tone="base" />
-                <BlockStack gap="100">
-                  <Text as="h3" variant="headingMd" fontWeight="semibold">
-                    Spector Alert Settings
-                  </Text>
-                  <Text as="p" variant="bodySm" tone="subdued">
-                    Configure thresholds, notifications, and storefront visibility controls
-                  </Text>
-                </BlockStack>
-              </InlineStack>
-              <Button
-                onClick={() => setShowAlertSettings(!showAlertSettings)}
-                variant="tertiary"
-                size="medium"
-                icon={showAlertSettings ? ChevronUpIcon : ChevronDownIcon}
-              >
-                {showAlertSettings ? 'Hide Settings' : 'Show Settings'}
-              </Button>
-            </InlineStack>
-            
-            {/* Collapsible Settings Content */}
-            <Collapsible
-              open={showAlertSettings}
-              id="alert-settings-collapsible"
-              transition={{duration: '200ms', timingFunction: 'ease-in-out'}}
-            >
-              <BlockStack gap="400">
-                {/* Threshold Controls Section */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr 1fr',
-                  gap: '1.5rem',
-                  padding: '1.25rem',
-                  background: '#f8fafc',
-                  borderRadius: '10px',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  {/* Threshold Setting */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <Text as="span" variant="bodySm" tone="subdued" fontWeight="medium">
-                      Alert Threshold
-                    </Text>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <div style={{ width: '120px' }}>
-                        <TextField
-                          label=""
-                          type="number"
-                          value={pendingThreshold.toString()}
-                          onChange={handleThresholdChange}
-                          autoComplete="off"
-                          min={1}
-                          max={100}
-                          suffix="units"
-                          placeholder="5"
-                        />
-                      </div>
-                      <button
-                        onClick={confirmThreshold}
-                        disabled={pendingThreshold === inventoryThreshold}
-                        className="reload-button"
-                        style={{
-                          background: pendingThreshold !== inventoryThreshold ? '#059669' : '#d1d5db',
-                          opacity: pendingThreshold !== inventoryThreshold ? 1 : 0.6,
-                          cursor: pendingThreshold !== inventoryThreshold ? 'pointer' : 'not-allowed',
-                        }}
-                      >
-                        Apply
-                      </button>
-                    </div>
-                    <Text as="p" variant="bodySm" tone="subdued">
-                      Products ≤{inventoryThreshold} units trigger alerts
-                    </Text>
-                  </div>
-                  
-                  {/* Out of Stock Email Alert */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <Text as="span" variant="bodySm" tone="subdued" fontWeight="medium">
-                      Out of Stock Notifications
-                    </Text>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <div style={{
-                        background: '#fef2f2',
-                        color: '#dc2626',
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: '4px',
-                        fontSize: '11px',
-                        fontWeight: '600',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px'
-                      }}>
-                        CRITICAL
-                      </div>
-                      <Text as="span" variant="bodySm" tone="subdued">
-                        Zero stock alerts
-                      </Text>
-                    </div>
-                    <Text as="p" variant="bodySm" tone="subdued">
-                      {oosEmailEnabled ? 'Will notify when products are out of stock' : 'Click to enable out of stock email alerts'}
-                    </Text>
-                    
-                    {/* Toggle Switch for OOS */}
-                    <div style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '0.5rem',
-                      marginTop: '0.5rem'
-                    }}>
-                      <div
-                        style={{
-                          width: '44px',
-                          height: '24px',
-                          backgroundColor: oosEmailEnabled ? '#dc2626' : '#d1d5db',
-                          borderRadius: '12px',
-                          position: 'relative',
-                          cursor: 'pointer',
-                          transition: 'all 0.3s ease',
-                          border: oosEmailEnabled ? '2px solid #b91c1c' : '2px solid #9ca3af'
-                        }}
-                        onClick={() => handleOosToggle(!oosEmailEnabled)}
-                      >
-                        <div
-                          style={{
-                            width: '16px',
-                            height: '16px',
-                            backgroundColor: 'white',
-                            borderRadius: '50%',
-                            position: 'absolute',
-                            top: '2px',
-                            left: oosEmailEnabled ? '22px' : '2px',
-                            transition: 'all 0.3s ease',
-                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
-                          }}
-                        />
-                      </div>
-                      <Text as="span" variant="bodySm" fontWeight="medium" tone={oosEmailEnabled ? 'critical' : 'subdued'}>
-                        {oosEmailEnabled ? 'Enabled' : 'Disabled'}
-                      </Text>
-                    </div>
-                  </div>
-                  
-                  {/* Critical Level Email Alert */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <Text as="span" variant="bodySm" tone="subdued" fontWeight="medium">
-                      Critical Level Notifications
-                    </Text>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <div style={{
-                        background: '#fffbeb',
-                        color: '#d97706',
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: '4px',
-                        fontSize: '11px',
-                        fontWeight: '600',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px'
-                      }}>
-                        WARNING
-                      </div>
-                      <Text as="span" variant="bodySm" tone="subdued">
-                        ≤{Math.floor(inventoryThreshold / 2)} units
-                      </Text>
-                    </div>
-                    <Text as="p" variant="bodySm" tone="subdued">
-                      {criticalEmailEnabled ? 'Will notify for critically low stock levels' : 'Click to enable critical level email alerts'}
-                    </Text>
-                    
-                    {/* Toggle Switch for Critical */}
-                    <div style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '0.5rem',
-                      marginTop: '0.5rem'
-                    }}>
-                      <div
-                        style={{
-                          width: '44px',
-                          height: '24px',
-                          backgroundColor: criticalEmailEnabled ? '#f59e0b' : '#d1d5db',
-                          borderRadius: '12px',
-                          position: 'relative',
-                          cursor: 'pointer',
-                          transition: 'all 0.3s ease',
-                          border: criticalEmailEnabled ? '2px solid #d97706' : '2px solid #9ca3af'
-                        }}
-                        onClick={() => handleCriticalToggle(!criticalEmailEnabled)}
-                      >
-                        <div
-                          style={{
-                            width: '16px',
-                            height: '16px',
-                            backgroundColor: 'white',
-                            borderRadius: '50%',
-                            position: 'absolute',
-                            top: '2px',
-                            left: criticalEmailEnabled ? '22px' : '2px',
-                            transition: 'all 0.3s ease',
-                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
-                          }}
-                        />
-                      </div>
-                      <Text as="span" variant="bodySm" fontWeight="medium" tone={criticalEmailEnabled ? 'critical' : 'subdued'}>
-                        {criticalEmailEnabled ? 'Enabled' : 'Disabled'}
-                      </Text>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Management Settings Section */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '1.5rem',
-                  padding: '1.5rem',
-                  background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  {/* Notification Settings */}
-                  <div style={{
-                    background: '#ffffff',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                    padding: '1.25rem'
-                  }}>
-                    <BlockStack gap="300">
-                      <InlineStack align="space-between" blockAlign="center">
-                        <Text as="h4" variant="headingSm" fontWeight="semibold">
-                          Notification Settings
-                        </Text>
-                        <InlineStack gap="200">
-                          {localNotificationSettings.email.enabled ? (
-                            <Badge tone="success">Active</Badge>
-                          ) : (
-                            <Badge tone="attention">Disabled</Badge>
-                          )}
-                        </InlineStack>
-                      </InlineStack>
-                      
-                      <Text as="p" variant="bodySm" tone="subdued">
-                        {localNotificationSettings.email.enabled && localNotificationSettings.email.recipientEmail
-                          ? `Multi-channel alerts configured for comprehensive monitoring`
-                          : "Set up email alerts for low stock notifications"
-                        }
-                      </Text>
-                      
-                      <InlineStack gap="200">
-                        <Button 
-                          onClick={() => setShowNotificationSettings(true)}
-                          size="slim"
-                          variant="primary"
-                        >
-                          Configure
-                        </Button>
-                        
-                        {localNotificationSettings.email.enabled && localNotificationSettings.email.recipientEmail && (
-                          <Form method="post">
-                            <input type="hidden" name="actionType" value="testEmail" />
-                            <Button submit size="slim" variant="secondary">
-                              Test
-                            </Button>
-                          </Form>
-                        )}
-                      </InlineStack>
-                    </BlockStack>
-                  </div>
-
-                  {/* Storefront Visibility */}
-                  <div style={{
-                    background: '#ffffff',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                    padding: '1.25rem'
-                  }}>
-                    <BlockStack gap="300">
-                      <InlineStack align="space-between" blockAlign="center">
-                        <Text as="h4" variant="headingSm" fontWeight="semibold">
-                          Storefront Visibility
-                        </Text>
-                        <InlineStack gap="200">
-                          {localVisibilitySettings.enabled ? (
-                            <Badge tone="success">Active</Badge>
-                          ) : (
-                            <Badge tone="attention">Disabled</Badge>
-                          )}
-                        </InlineStack>
-                      </InlineStack>
-                      
-                      <Text as="p" variant="bodySm" tone="subdued">
-                        {localVisibilitySettings.enabled
-                          ? `Auto-${localVisibilitySettings.hideOutOfStock ? 'hiding' : 'managing'} out-of-stock products`
-                          : "Manage product visibility based on inventory levels"
-                        }
-                      </Text>
-                      
-                      <InlineStack gap="200">
-                        <Button 
-                          onClick={() => setShowVisibilitySettings(true)}
-                          size="slim"
-                          variant="primary"
-                        >
-                          Configure
-                        </Button>
-                        
-                        {localVisibilitySettings.enabled && zeroStockProducts.length > 0 && (
-                          <Form method="post">
-                            <input type="hidden" name="actionType" value="updateOutOfStockVisibility" />
-                            <Button submit size="slim" variant="secondary" tone="critical">
-                              Hide {zeroStockProducts.length} OOS
-                            </Button>
-                          </Form>
-                        )}
-
-                        {localVisibilitySettings.enabled && selectedProducts.size > 0 && (
-                          <Form method="post">
-                            <input type="hidden" name="actionType" value="hideSelectedProducts" />
-                            <input type="hidden" name="selectedProductIds" value={Array.from(selectedProducts).join(',')} />
-                            <Button submit size="slim" variant="secondary" tone="critical">
-                              Hide {selectedProducts.size.toString()} Selected
-                            </Button>
-                          </Form>
-                        )}
-
-                        {localVisibilitySettings.enabled && zeroStockProducts.length > 0 && (
-                          <Button 
-                            onClick={selectAllOOSProducts}
-                            size="slim" 
-                            variant="plain"
-                          >
-                            Select All OOS
-                          </Button>
-                        )}
-
-                        {selectedProducts.size > 0 && (
-                          <Button 
-                            onClick={clearSelection}
-                            size="slim" 
-                            variant="plain"
-                            tone="critical"
-                          >
-                            Clear Selection
-                          </Button>
-                        )}
-                      </InlineStack>
-                    </BlockStack>
-                  </div>
-                </div>
-              </BlockStack>
-            </Collapsible>
-          </BlockStack>
-        </div>
+        {/* Enhanced Threshold Control - Moved to Storefront Visibility Manager */}
+        {/* This section has been consolidated into the Storefront Visibility Manager below */}
       </div>
       
       <BlockStack gap="500">
@@ -1956,32 +1684,463 @@ export default function Index() {
         <Layout>
           <Layout.Section>
             <BlockStack gap="400">
-              {/* Out of Stock Products */}
-              <Card>
-                <BlockStack gap="300">
+              {/* Out of Stock & Low Stock Management */}
+              <div id="out-of-stock-section" data-section="out-of-stock">
+                <Card>
+                <BlockStack gap="400">
+                  {/* Section Header */}
                   <InlineStack align="space-between" blockAlign="center">
                     <InlineStack gap="300" blockAlign="center">
-                      <Text as="h2" variant="headingMd">
-                        Out of Stock Products
+                      <Text as="h2" variant="headingLg" fontWeight="semibold">
+                        Stock Management & Visibility
                       </Text>
-                      {zeroStockProducts.length > 0 && (
-                        <div style={{
-                          backgroundColor: 'rgba(220, 38, 38, 0.1)',
-                          padding: '0.25rem 0.75rem',
-                          borderRadius: '12px',
-                          border: '1px solid rgba(220, 38, 38, 0.2)'
+                      <div style={{
+                        backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '12px',
+                        border: '1px solid rgba(220, 38, 38, 0.2)'
+                      }}>
+                        <InlineStack gap="100" blockAlign="center">
+                          <Icon source={AlertTriangleIcon} tone="critical" />
+                          <Text as="span" variant="bodySm" tone="critical" fontWeight="medium">
+                            {zeroStockProducts.length + lowStockProducts.length} Products Need Attention
+                          </Text>
+                        </InlineStack>
+                      </div>
+                    </InlineStack>
+                    <InlineStack gap="200">
+                      <Badge tone="critical">{`${zeroStockProducts.length} Out of Stock`}</Badge>
+                      <Badge tone="warning">{`${lowStockProducts.length} Low Stock`}</Badge>
+                    </InlineStack>
+                  </InlineStack>
+
+                  {/* Storefront Visibility & Alert Manager - Complete Solution */}
+                  <div style={{
+                    background: '#f8fafc',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '12px',
+                    padding: '1.5rem'
+                  }}>
+                    <BlockStack gap="400">
+                      {/* Header Section */}
+                      <InlineStack align="space-between" blockAlign="center">
+                        <BlockStack gap="100">
+                          <Text as="h4" variant="headingMd" fontWeight="semibold">
+                            Storefront Visibility & Alert Manager
+                          </Text>
+                          <Text as="p" variant="bodySm" tone="subdued">
+                            Manage product visibility and configure comprehensive alert notifications
+                          </Text>
+                        </BlockStack>
+                        
+                        {/* Main Toggle Switch - Smaller and Consistent */}
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '0.75rem'
                         }}>
-                          <InlineStack gap="100" blockAlign="center">
-                            <Icon source={AlertTriangleIcon} tone="critical" />
-                            <Text as="span" variant="bodySm" tone="critical" fontWeight="medium">
-                              Immediate Action Required
-                            </Text>
-                          </InlineStack>
+                          <Text as="span" variant="bodySm" fontWeight="medium" tone={localVisibilitySettings.enabled ? 'success' : 'subdued'}>
+                            {localVisibilitySettings.enabled ? 'Active' : 'Inactive'}
+                          </Text>
+                          <div
+                            style={{
+                              width: '40px',
+                              height: '20px',
+                              backgroundColor: localVisibilitySettings.enabled ? '#059669' : '#d1d5db',
+                              borderRadius: '10px',
+                              position: 'relative',
+                              cursor: 'pointer',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onClick={() => {
+                              const newSettings = { ...localVisibilitySettings, enabled: !localVisibilitySettings.enabled };
+                              setLocalVisibilitySettings(newSettings);
+                              handleVisibilitySettingChange('enabled', !localVisibilitySettings.enabled);
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: '16px',
+                                height: '16px',
+                                backgroundColor: 'white',
+                                borderRadius: '50%',
+                                position: 'absolute',
+                                top: '2px',
+                                left: localVisibilitySettings.enabled ? '22px' : '2px',
+                                transition: 'all 0.3s ease',
+                                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)'
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </InlineStack>
+
+                      {/* Comprehensive Settings Grid - Only show when enabled */}
+                      {localVisibilitySettings.enabled && (
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(2, 1fr)',
+                          gap: '1.5rem',
+                          padding: '1.5rem',
+                          background: 'rgba(255, 255, 255, 0.8)',
+                          borderRadius: '8px',
+                          border: '1px solid rgba(226, 232, 240, 0.6)'
+                        }}>
+                          {/* Threshold Configuration */}
+                          <div style={{
+                            background: '#ffffff',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '8px',
+                            padding: '1.25rem'
+                          }}>
+                            <BlockStack gap="300">
+                              <Text as="h5" variant="headingSm" fontWeight="semibold">
+                                Alert Threshold Settings
+                              </Text>
+                              
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                <div style={{ width: '120px' }}>
+                                  <TextField
+                                    label=""
+                                    type="number"
+                                    value={pendingThreshold.toString()}
+                                    onChange={handleThresholdChange}
+                                    autoComplete="off"
+                                    min={1}
+                                    max={100}
+                                    suffix="units"
+                                    placeholder="5"
+                                  />
+                                </div>
+                                <button
+                                  onClick={confirmThreshold}
+                                  disabled={pendingThreshold === inventoryThreshold}
+                                  className="reload-button"
+                                  style={{
+                                    background: pendingThreshold !== inventoryThreshold ? '#059669' : '#d1d5db',
+                                    opacity: pendingThreshold !== inventoryThreshold ? 1 : 0.6,
+                                    cursor: pendingThreshold !== inventoryThreshold ? 'pointer' : 'not-allowed',
+                                    padding: '0.5rem 1rem',
+                                    fontSize: '12px'
+                                  }}
+                                >
+                                  Apply
+                                </button>
+                              </div>
+                              
+                              <Text as="p" variant="bodySm" tone="subdued">
+                                Products with ≤{inventoryThreshold} units will trigger alerts
+                              </Text>
+                            </BlockStack>
+                          </div>
+
+                          {/* Notification Types */}
+                          <div style={{
+                            background: '#ffffff',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '8px',
+                            padding: '1.25rem'
+                          }}>
+                            <BlockStack gap="300">
+                              <Text as="h5" variant="headingSm" fontWeight="semibold">
+                                Notification Configuration
+                              </Text>
+                              
+                              {/* Out of Stock Notifications */}
+                              <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                padding: '0.75rem',
+                                background: '#fef2f2',
+                                borderRadius: '6px',
+                                border: '1px solid #fecaca'
+                              }}>
+                                <div>
+                                  <Text as="p" variant="bodySm" fontWeight="medium">
+                                    Out of Stock Alerts
+                                  </Text>
+                                  <Text as="p" variant="bodySm" tone="subdued">
+                                    Zero inventory notifications
+                                  </Text>
+                                </div>
+                                <div
+                                  style={{
+                                    width: '36px',
+                                    height: '18px',
+                                    backgroundColor: oosEmailEnabled ? '#dc2626' : '#d1d5db',
+                                    borderRadius: '9px',
+                                    position: 'relative',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                  }}
+                                  onClick={() => handleOosToggle(!oosEmailEnabled)}
+                                >
+                                  <div
+                                    style={{
+                                      width: '14px',
+                                      height: '14px',
+                                      backgroundColor: 'white',
+                                      borderRadius: '50%',
+                                      position: 'absolute',
+                                      top: '2px',
+                                      left: oosEmailEnabled ? '20px' : '2px',
+                                      transition: 'all 0.3s ease',
+                                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
+                                    }}
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Critical Level Notifications */}
+                              <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                padding: '0.75rem',
+                                background: '#fffbeb',
+                                borderRadius: '6px',
+                                border: '1px solid #fcd34d'
+                              }}>
+                                <div>
+                                  <Text as="p" variant="bodySm" fontWeight="medium">
+                                    Critical Level Alerts
+                                  </Text>
+                                  <Text as="p" variant="bodySm" tone="subdued">
+                                    ≤{Math.floor(inventoryThreshold / 2)} units threshold
+                                  </Text>
+                                </div>
+                                <div
+                                  style={{
+                                    width: '36px',
+                                    height: '18px',
+                                    backgroundColor: criticalEmailEnabled ? '#f59e0b' : '#d1d5db',
+                                    borderRadius: '9px',
+                                    position: 'relative',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                  }}
+                                  onClick={() => handleCriticalToggle(!criticalEmailEnabled)}
+                                >
+                                  <div
+                                    style={{
+                                      width: '14px',
+                                      height: '14px',
+                                      backgroundColor: 'white',
+                                      borderRadius: '50%',
+                                      position: 'absolute',
+                                      top: '2px',
+                                      left: criticalEmailEnabled ? '20px' : '2px',
+                                      transition: 'all 0.3s ease',
+                                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
+                                    }}
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Multi-channel Settings */}
+                              <div style={{
+                                padding: '0.75rem',
+                                background: '#f8fafc',
+                                borderRadius: '6px',
+                                border: '1px solid #e2e8f0'
+                              }}>
+                                <InlineStack align="space-between" blockAlign="center">
+                                  <div>
+                                    <Text as="p" variant="bodySm" fontWeight="medium">
+                                      Multi-Channel Alerts
+                                    </Text>
+                                    <Text as="p" variant="bodySm" tone="subdued">
+                                      Email, Slack, Discord integration
+                                    </Text>
+                                  </div>
+                                  <Button 
+                                    onClick={() => setShowNotificationSettings(true)}
+                                    size="slim"
+                                    variant="tertiary"
+                                  >
+                                    Configure
+                                  </Button>
+                                </InlineStack>
+                              </div>
+                            </BlockStack>
+                          </div>
                         </div>
                       )}
+
+                      {/* Quick Actions - Simplified and Clean */}
+                      {localVisibilitySettings.enabled && (
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(3, 1fr)',
+                          gap: '1rem',
+                          padding: '1rem',
+                          background: 'rgba(255, 255, 255, 0.9)',
+                          borderRadius: '8px',
+                          border: '1px solid rgba(226, 232, 240, 0.5)'
+                        }}>
+                          {/* Bulk Hide Out of Stock */}
+                          <div style={{
+                            textAlign: 'center',
+                            padding: '1rem',
+                            background: '#ffffff',
+                            border: '1px solid #fecaca',
+                            borderRadius: '6px'
+                          }}>
+                            <BlockStack gap="200">
+                              <Text as="p" variant="bodyMd" fontWeight="semibold">
+                                Hide Out of Stock
+                              </Text>
+                              <Text as="p" variant="bodySm" tone="subdued">
+                                {zeroStockProducts.length} products ready to hide
+                              </Text>
+                              <Form method="post">
+                                <input type="hidden" name="actionType" value="updateOutOfStockVisibility" />
+                                <Button 
+                                  submit 
+                                  size="medium" 
+                                  variant="primary" 
+                                  tone="critical"
+                                  disabled={zeroStockProducts.length === 0}
+                                  fullWidth
+                                >
+                                  {zeroStockProducts.length === 0 ? 'No Products to Hide' : `Hide ${zeroStockProducts.length} Products`}
+                                </Button>
+                              </Form>
+                            </BlockStack>
+                          </div>
+
+                          {/* Bulk Hide Selected */}
+                          <div style={{
+                            textAlign: 'center',
+                            padding: '1rem',
+                            background: '#ffffff',
+                            border: '1px solid #fcd34d',
+                            borderRadius: '6px',
+                            opacity: selectedProducts.size > 0 ? 1 : 0.5
+                          }}>
+                            <BlockStack gap="200">
+                              <Text as="p" variant="bodyMd" fontWeight="semibold">
+                                Hide Selected
+                              </Text>
+                              <Text as="p" variant="bodySm" tone="subdued">
+                                {selectedProducts.size} products selected
+                              </Text>
+                              <Form method="post">
+                                <input type="hidden" name="actionType" value="hideSelectedProducts" />
+                                <input type="hidden" name="selectedProductIds" value={Array.from(selectedProducts).join(',')} />
+                                <Button 
+                                  submit 
+                                  size="medium" 
+                                  variant="primary" 
+                                  tone="critical"
+                                  disabled={selectedProducts.size === 0}
+                                  fullWidth
+                                >
+                                  {selectedProducts.size === 0 ? 'Select Products First' : `Hide ${selectedProducts.size} Selected`}
+                                </Button>
+                              </Form>
+                            </BlockStack>
+                          </div>
+
+                          {/* Quick Select */}
+                          <div style={{
+                            textAlign: 'center',
+                            padding: '1rem',
+                            background: '#ffffff',
+                            border: '1px solid #93c5fd',
+                            borderRadius: '6px'
+                          }}>
+                            <BlockStack gap="200">
+                              <Text as="p" variant="bodyMd" fontWeight="semibold">
+                                Quick Select
+                              </Text>
+                              <Text as="p" variant="bodySm" tone="subdued">
+                                Batch select products
+                              </Text>
+                              <InlineStack gap="100">
+                                <Button 
+                                  onClick={selectAllOOSProducts}
+                                  size="slim" 
+                                  variant="secondary"
+                                  disabled={zeroStockProducts.length === 0}
+                                >
+                                  All OOS
+                                </Button>
+                                <Button 
+                                  onClick={clearSelection}
+                                  size="slim" 
+                                  variant="plain"
+                                  disabled={selectedProducts.size === 0}
+                                >
+                                  Clear
+                                </Button>
+                              </InlineStack>
+                            </BlockStack>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Status Summary - Always show */}
+                      <div style={{
+                        background: localVisibilitySettings.enabled ? 'rgba(16, 185, 129, 0.05)' : 'rgba(107, 114, 128, 0.05)',
+                        border: `1px solid ${localVisibilitySettings.enabled ? 'rgba(16, 185, 129, 0.2)' : 'rgba(107, 114, 128, 0.2)'}`,
+                        borderRadius: '8px',
+                        padding: '1rem'
+                      }}>
+                        <InlineStack align="space-between" blockAlign="center">
+                          <InlineStack gap="300" blockAlign="center">
+                            <div style={{
+                              width: '8px',
+                              height: '8px',
+                              backgroundColor: localVisibilitySettings.enabled ? '#10b981' : '#6b7280',
+                              borderRadius: '50%'
+                            }}></div>
+                            <Text as="p" variant="bodyMd" fontWeight="medium">
+                              {localVisibilitySettings.enabled 
+                                ? 'System active - Managing visibility and alerts automatically' 
+                                : 'System inactive - Enable to start managing products'
+                              }
+                            </Text>
+                          </InlineStack>
+                        </InlineStack>
+                        
+                        {localVisibilitySettings.enabled && (
+                          <div style={{ marginTop: '0.75rem' }}>
+                            <Text as="p" variant="bodySm" tone="subdued">
+                              Monitoring {products.length} products • {oosEmailEnabled ? 'Out of stock alerts enabled' : 'Out of stock alerts disabled'} • {criticalEmailEnabled ? 'Critical level alerts enabled' : 'Critical level alerts disabled'}
+                            </Text>
+                          </div>
+                        )}
+                      </div>
+                    </BlockStack>
+                  </div>
+
+                  {/* Out of Stock Products Subsection */}
+                  <BlockStack gap="300">
+                    <InlineStack align="space-between" blockAlign="center">
+                      <InlineStack gap="300" blockAlign="center">
+                        <Text as="h3" variant="headingMd" fontWeight="semibold">
+                          Out of Stock Products
+                        </Text>
+                        {zeroStockProducts.length > 0 && (
+                          <div style={{
+                            backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                            padding: '0.25rem 0.75rem',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(220, 38, 38, 0.2)'
+                          }}>
+                            <InlineStack gap="100" blockAlign="center">
+                              <Icon source={AlertTriangleIcon} tone="critical" />
+                              <Text as="span" variant="bodySm" tone="critical" fontWeight="medium">
+                                Immediate Action Required
+                              </Text>
+                            </InlineStack>
+                          </div>
+                        )}
+                      </InlineStack>
+                      <Badge tone="critical">{zeroStockProducts.length}</Badge>
                     </InlineStack>
-                    <Badge tone="critical">{zeroStockProducts.length}</Badge>
-                  </InlineStack>
                   
                   {zeroStockProducts.length === 0 ? (
                     <EmptyState
@@ -2000,14 +2159,18 @@ export default function Index() {
                       </Text>
                       
                       {/* Compact Grid Layout with Scroll */}
-                      <div style={{ 
-                        maxHeight: '280px',
-                        overflowY: 'auto',
-                        border: '1px solid #e2e8f0',
-                        borderRadius: '8px',
-                        padding: '1rem',
-                        background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)'
-                      }}>
+                      <div 
+                        id="out-of-stock-grid"
+                        style={{ 
+                          maxHeight: '350px',
+                          overflowY: 'auto',
+                          border: '1px solid #e2e8f0',
+                          borderRadius: '8px',
+                          padding: '1rem',
+                          background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+                          transition: 'all 0.3s ease'
+                        }}
+                      >
                         <div style={{
                           display: 'grid',
                           gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -2168,27 +2331,246 @@ export default function Index() {
                             </div>
                           ))}
                         </div>
-                        
-                        {/* Show count at bottom if there are many items */}
-                        {zeroStockProducts.length > 6 && (
-                          <div style={{
-                            textAlign: 'center',
-                            marginTop: '1rem',
-                            padding: '0.5rem',
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            borderRadius: '6px',
-                            border: '1px solid #fecaca'
-                          }}>
-                            <Text as="p" variant="bodySm" tone="subdued">
-                              Showing {zeroStockProducts.length} out of stock products
-                            </Text>
-                          </div>
-                        )}
                       </div>
                     </BlockStack>
                   )}
+                  </BlockStack>
+
+                  {/* Low Stock Products Subsection */}
+                  <div style={{
+                    borderTop: '2px solid #e2e8f0',
+                    paddingTop: '1.5rem'
+                  }}>
+                    <BlockStack gap="300">
+                      <InlineStack align="space-between" blockAlign="center">
+                        <InlineStack gap="300" blockAlign="center">
+                          <Text as="h3" variant="headingMd" fontWeight="semibold">
+                            Low Stock Products
+                          </Text>
+                          {lowStockProducts.length > 0 && (
+                            <div style={{
+                              backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                              padding: '0.25rem 0.75rem',
+                              borderRadius: '12px',
+                              border: '1px solid rgba(245, 158, 11, 0.2)'
+                            }}>
+                              <InlineStack gap="100" blockAlign="center">
+                                <Icon source={AlertTriangleIcon} tone="warning" />
+                                <Text as="span" variant="bodySm" tone="critical" fontWeight="medium">
+                                  Running Low - Restock Soon
+                                </Text>
+                              </InlineStack>
+                            </div>
+                          )}
+                        </InlineStack>
+                        <Badge tone="warning">{lowStockProducts.length.toString()}</Badge>
+                      </InlineStack>
+                      
+                      {lowStockProducts.length === 0 ? (
+                        <EmptyState
+                          image=""
+                          heading="No low stock alerts"
+                          children={
+                            <Text as="p" variant="bodyMd" tone="subdued">
+                              All products are above the threshold of {inventoryThreshold} units
+                            </Text>
+                          }
+                        />
+                      ) : (
+                        <BlockStack gap="300">
+                          <Text as="p" variant="bodyMd" tone="subdued">
+                            Products below {inventoryThreshold} units that need restocking attention
+                          </Text>
+                          
+                          {/* Compact Grid Layout with Scroll */}
+                          <div 
+                            id="low-stock-grid"
+                            style={{ 
+                              maxHeight: '350px',
+                              overflowY: 'auto',
+                              border: '1px solid #e2e8f0',
+                              borderRadius: '8px',
+                              padding: '1rem',
+                              background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+                              transition: 'all 0.3s ease'
+                            }}
+                          >
+                            <div style={{
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                              gap: '0.75rem'
+                            }}>
+                              {lowStockProducts.map((product: Product) => {
+                                const isCritical = product.stock <= Math.floor(inventoryThreshold / 2);
+                                return (
+                                  <div key={product.id} className="product-card-hover" style={{ 
+                                    background: '#ffffff',
+                                    border: isCritical ? '1px solid #f59e0b' : '1px solid #fcd34d',
+                                    borderRadius: '8px',
+                                    padding: '0.75rem',
+                                    transition: 'all 0.2s ease',
+                                    cursor: 'pointer'
+                                  }}
+                                  onClick={() => handleProductClick(product.id)}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.borderColor = isCritical ? '#d97706' : '#f59e0b';
+                                    e.currentTarget.style.boxShadow = `0 2px 8px rgba(${isCritical ? '217, 119, 6' : '245, 158, 11'}, 0.2)`;
+                                    e.currentTarget.style.transform = 'translateY(-1px)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.borderColor = isCritical ? '#f59e0b' : '#fcd34d';
+                                    e.currentTarget.style.boxShadow = 'none';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                  }}>
+                                    <InlineStack gap="300" blockAlign="center">
+                                      {/* Selection Checkbox */}
+                                      <div 
+                                        onClick={(e) => e.stopPropagation()}
+                                        style={{ flexShrink: 0 }}
+                                      >
+                                        <Checkbox 
+                                          checked={selectedProducts.has(product.id)}
+                                          onChange={() => toggleProductSelection(product.id)}
+                                          label=""
+                                        />
+                                      </div>
+                                      
+                                      {/* Compact Product Image */}
+                                      <div style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        borderRadius: '6px',
+                                        overflow: 'hidden',
+                                        backgroundColor: '#fffbeb',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        border: isCritical ? '2px solid #f59e0b' : '2px solid #fcd34d',
+                                        flexShrink: 0
+                                      }}>
+                                        {product.image ? (
+                                          <img
+                                            src={product.image}
+                                            alt={product.imageAlt}
+                                            style={{
+                                              width: '100%',
+                                              height: '100%',
+                                              objectFit: 'cover',
+                                              opacity: 0,
+                                              transition: 'opacity 0.3s ease-in-out'
+                                            }}
+                                            onLoad={(e) => {
+                                              e.currentTarget.style.opacity = '1';
+                                            }}
+                                            onError={(e) => {
+                                              e.currentTarget.style.display = 'none';
+                                            }}
+                                          />
+                                        ) : (
+                                          <Icon source={InventoryIcon} tone="warning" />
+                                        )}
+                                      </div>
+                                      
+                                      {/* Compact Product Info */}
+                                      <div style={{ flex: 1, minWidth: 0 }}>
+                                        <BlockStack gap="100">
+                                          <div style={{ 
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap'
+                                          }}>
+                                            <Text as="p" variant="bodyMd" fontWeight="medium">
+                                              {product.name}
+                                            </Text>
+                                          </div>
+                                          <InlineStack gap="200" align="space-between">
+                                            <InlineStack gap="100" blockAlign="center">
+                                              <Badge tone={isCritical ? "critical" : "warning"} size="small">
+                                                {`${product.stock} units`}
+                                              </Badge>
+                                              {isCritical && (
+                                                <Badge tone="critical" size="small">
+                                                  Critical
+                                                </Badge>
+                                              )}
+                                              {/* Product Visibility Status */}
+                                              {product.status === 'ACTIVE' && product.handle ? (
+                                                <button
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (product.handle) {
+                                                      window.open(getProductStoreUrl(shopInfo.myshopifyDomain, product.handle), '_blank');
+                                                    }
+                                                  }}
+                                                  style={{
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    padding: '2px',
+                                                    borderRadius: '2px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    color: '#10b981'
+                                                  }}
+                                                  title="View live product in store"
+                                                >
+                                                  <Icon source={ViewIcon} tone="success" />
+                                                </button>
+                                              ) : (
+                                                <div
+                                                  style={{
+                                                    padding: '2px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    color: '#ef4444'
+                                                  }}
+                                                  title="Product is drafted/hidden from store"
+                                                >
+                                                  <Icon source={HideIcon} tone="critical" />
+                                                </div>
+                                              )}
+                                            </InlineStack>
+                                            <button
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleProductClick(product.id);
+                                              }}
+                                              style={{
+                                                background: isCritical ? '#dc2626' : '#f59e0b',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '4px',
+                                                padding: '0.25rem 0.5rem',
+                                                fontSize: '12px',
+                                                fontWeight: '500',
+                                                cursor: 'pointer',
+                                                transition: 'background 0.2s ease'
+                                              }}
+                                              onMouseEnter={(e) => {
+                                                e.currentTarget.style.background = isCritical ? '#b91c1c' : '#d97706';
+                                              }}
+                                              onMouseLeave={(e) => {
+                                                e.currentTarget.style.background = isCritical ? '#dc2626' : '#f59e0b';
+                                              }}
+                                            >
+                                              {isCritical ? 'Urgent' : 'Manage'}
+                                            </button>
+                                          </InlineStack>
+                                        </BlockStack>
+                                      </div>
+                                    </InlineStack>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </BlockStack>
+                      )}
+                    </BlockStack>
+                  </div>
                 </BlockStack>
               </Card>
+              </div>
             </BlockStack>
           </Layout.Section>
           
@@ -2236,8 +2618,8 @@ export default function Index() {
                     <div data-toggle-button="forecast">
                       <Button
                         onClick={() => setInventoryForecastOpen(!inventoryForecastOpen)}
-                        variant="primary"
-                        size="large"
+                        variant="tertiary"
+                        size="medium"
                         icon={inventoryForecastOpen ? ChevronUpIcon : ChevronDownIcon}
                       >
                         {inventoryForecastOpen ? 'Hide Forecast Details' : 'Show Forecast Details'}
@@ -2654,8 +3036,8 @@ export default function Index() {
                   <div data-toggle-button="tracker">
                     <Button
                       onClick={() => setProductTrackerOpen(!productTrackerOpen)}
-                      variant="primary"
-                      size="large"
+                      variant="tertiary"
+                      size="medium"
                       icon={productTrackerOpen ? ChevronUpIcon : ChevronDownIcon}
                     >
                       {productTrackerOpen ? 'Hide Analysis Details' : 'Show Analysis Details'}
@@ -3139,11 +3521,11 @@ export default function Index() {
         </Modal.Section>
       </Modal>
 
-      {/* Storefront Visibility Settings Modal */}
+      {/* Storefront Visibility Settings Modal - Streamlined for High Volume */}
       <Modal
         open={showVisibilitySettings}
         onClose={() => setShowVisibilitySettings(false)}
-        title="Storefront Visibility Management"
+        title="Advanced Visibility Settings"
         primaryAction={{
           content: 'Save Settings',
           onAction: saveVisibilitySettings,
@@ -3163,67 +3545,222 @@ export default function Index() {
             <input type="hidden" name="showWhenRestocked" value={localVisibilitySettings.showWhenRestocked.toString()} />
             
             <FormLayout>
+              {/* Main Settings Card */}
               <Card>
-                <BlockStack gap="300">
-                  <Text as="h4" variant="headingSm" fontWeight="bold">
-                    Automatic Visibility Control
+                <BlockStack gap="400">
+                  <Text as="h4" variant="headingMd" fontWeight="bold">
+                    Automation Rules
                   </Text>
                   
-                  <Checkbox
-                    label="Enable storefront visibility management"
-                    checked={localVisibilitySettings.enabled}
-                    onChange={(checked) => handleVisibilitySettingChange('enabled', checked)}
-                    helpText="Automatically control product visibility on your storefront based on inventory levels"
-                  />
+                  {/* Master Toggle */}
+                  <div style={{
+                    background: localVisibilitySettings.enabled ? 'rgba(16, 185, 129, 0.05)' : 'rgba(107, 114, 128, 0.05)',
+                    border: `2px solid ${localVisibilitySettings.enabled ? 'rgba(16, 185, 129, 0.2)' : 'rgba(107, 114, 128, 0.2)'}`,
+                    borderRadius: '12px',
+                    padding: '1.5rem'
+                  }}>
+                    <InlineStack align="space-between" blockAlign="center">
+                      <BlockStack gap="100">
+                        <Text as="p" variant="bodyLg" fontWeight="semibold">
+                          Automatic Visibility Management
+                        </Text>
+                        <Text as="p" variant="bodySm" tone="subdued">
+                          Automatically control product visibility based on inventory levels
+                        </Text>
+                      </BlockStack>
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '1rem'
+                      }}>
+                        <Text as="span" variant="bodyMd" fontWeight="medium" tone={localVisibilitySettings.enabled ? 'success' : 'subdued'}>
+                          {localVisibilitySettings.enabled ? 'ENABLED' : 'DISABLED'}
+                        </Text>
+                        <div
+                          style={{
+                            width: '60px',
+                            height: '32px',
+                            backgroundColor: localVisibilitySettings.enabled ? '#059669' : '#d1d5db',
+                            borderRadius: '16px',
+                            position: 'relative',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            border: localVisibilitySettings.enabled ? '2px solid #047857' : '2px solid #9ca3af'
+                          }}
+                          onClick={() => handleVisibilitySettingChange('enabled', !localVisibilitySettings.enabled)}
+                        >
+                          <div
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              backgroundColor: 'white',
+                              borderRadius: '50%',
+                              position: 'absolute',
+                              top: '2px',
+                              left: localVisibilitySettings.enabled ? '32px' : '2px',
+                              transition: 'all 0.3s ease',
+                              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </InlineStack>
+                  </div>
 
+                  {/* Detailed Settings - Only show when enabled */}
                   {localVisibilitySettings.enabled && (
-                    <>
-                      <Checkbox
-                        label="Hide out-of-stock products from storefront"
-                        checked={localVisibilitySettings.hideOutOfStock}
-                        onChange={(checked) => handleVisibilitySettingChange('hideOutOfStock', checked)}
-                        helpText="Products with 0 inventory will be automatically hidden from customers"
-                      />
+                    <BlockStack gap="300">
+                      <Text as="h5" variant="headingSm" fontWeight="semibold">
+                        Automation Behavior
+                      </Text>
                       
-                      <Checkbox
-                        label="Show products when restocked"
-                        checked={localVisibilitySettings.showWhenRestocked}
-                        onChange={(checked) => handleVisibilitySettingChange('showWhenRestocked', checked)}
-                        helpText="Automatically make products visible again when inventory is added"
-                      />
-                    </>
+                      {/* Hide Out of Stock Setting */}
+                      <div style={{
+                        background: '#ffffff',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        padding: '1rem'
+                      }}>
+                        <InlineStack align="space-between" blockAlign="center">
+                          <BlockStack gap="100">
+                            <Text as="p" variant="bodyMd" fontWeight="medium">
+                              Hide Out-of-Stock Products
+                            </Text>
+                            <Text as="p" variant="bodySm" tone="subdued">
+                              Products with 0 inventory will be hidden from your storefront (Draft status)
+                            </Text>
+                          </BlockStack>
+                          <Checkbox
+                            label=""
+                            checked={localVisibilitySettings.hideOutOfStock}
+                            onChange={(checked) => handleVisibilitySettingChange('hideOutOfStock', checked)}
+                          />
+                        </InlineStack>
+                      </div>
+                      
+                      {/* Show When Restocked Setting */}
+                      <div style={{
+                        background: '#ffffff',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        padding: '1rem'
+                      }}>
+                        <InlineStack align="space-between" blockAlign="center">
+                          <BlockStack gap="100">
+                            <Text as="p" variant="bodyMd" fontWeight="medium">
+                              Auto-Show When Restocked
+                            </Text>
+                            <Text as="p" variant="bodySm" tone="subdued">
+                              Automatically make products visible when inventory is added (Active status)
+                            </Text>
+                          </BlockStack>
+                          <Checkbox
+                            label=""
+                            checked={localVisibilitySettings.showWhenRestocked}
+                            onChange={(checked) => handleVisibilitySettingChange('showWhenRestocked', checked)}
+                          />
+                        </InlineStack>
+                      </div>
+                    </BlockStack>
                   )}
                 </BlockStack>
               </Card>
               
-              {localVisibilitySettings.enabled && (
-                <div style={{ 
-                  background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  padding: '1rem'
-                }}>
-                  <BlockStack gap="200">
-                    <Text as="h4" variant="headingSm" fontWeight="medium">
-                      How it works
+              {/* Info Card - Always show */}
+              <Card>
+                <BlockStack gap="300">
+                  <InlineStack gap="200" blockAlign="center">
+                    <Icon source={InfoIcon} tone="info" />
+                    <Text as="h5" variant="headingSm" fontWeight="semibold">
+                      How Visibility Management Works
                     </Text>
-                    <BlockStack gap="100">
-                      <Text as="p" variant="bodySm">
-                        • Products are set to "Draft" status to hide them from storefront
-                      </Text>
-                      <Text as="p" variant="bodySm">
-                        • Products are set to "Active" status to show them on storefront
-                      </Text>
-                      <Text as="p" variant="bodySm">
-                        • Changes apply immediately when you sync or update visibility
-                      </Text>
-                      <Text as="p" variant="bodySm">
-                        • Use "Sync All Products" to update all products at once
-                      </Text>
-                    </BlockStack>
-                  </BlockStack>
-                </div>
-              )}
+                  </InlineStack>
+                  
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '1rem'
+                  }}>
+                    {/* Hide Process */}
+                    <div style={{
+                      background: 'rgba(220, 38, 38, 0.05)',
+                      border: '1px solid rgba(220, 38, 38, 0.1)',
+                      borderRadius: '8px',
+                      padding: '1rem'
+                    }}>
+                      <BlockStack gap="200">
+                        <Text as="p" variant="bodyMd" fontWeight="semibold" tone="critical">
+                          Hiding Products (Draft)
+                        </Text>
+                        <BlockStack gap="100">
+                          <Text as="p" variant="bodySm">
+                            • Product status set to "Draft"
+                          </Text>
+                          <Text as="p" variant="bodySm">
+                            • Hidden from storefront immediately
+                          </Text>
+                          <Text as="p" variant="bodySm">
+                            • Still visible in admin panel
+                          </Text>
+                          <Text as="p" variant="bodySm">
+                            • Can be bulk processed for efficiency
+                          </Text>
+                        </BlockStack>
+                      </BlockStack>
+                    </div>
+
+                    {/* Show Process */}
+                    <div style={{
+                      background: 'rgba(16, 185, 129, 0.05)',
+                      border: '1px solid rgba(16, 185, 129, 0.1)',
+                      borderRadius: '8px',
+                      padding: '1rem'
+                    }}>
+                      <BlockStack gap="200">
+                        <Text as="p" variant="bodyMd" fontWeight="semibold" tone="success">
+                          Showing Products (Active)
+                        </Text>
+                        <BlockStack gap="100">
+                          <Text as="p" variant="bodySm">
+                            • Product status set to "Active"
+                          </Text>
+                          <Text as="p" variant="bodySm">
+                            • Visible on storefront immediately
+                          </Text>
+                          <Text as="p" variant="bodySm">
+                            • Available for purchase
+                          </Text>
+                          <Text as="p" variant="bodySm">
+                            • Automatic when inventory added
+                          </Text>
+                        </BlockStack>
+                      </BlockStack>
+                    </div>
+                  </div>
+
+                  {/* Performance Note for High Volume */}
+                  <div style={{
+                    background: 'rgba(59, 130, 246, 0.05)',
+                    border: '1px solid rgba(59, 130, 246, 0.1)',
+                    borderRadius: '8px',
+                    padding: '1rem'
+                  }}>
+                    <InlineStack gap="200" blockAlign="start">
+                      <Icon source={AlertTriangleIcon} tone="info" />
+                      <BlockStack gap="100">
+                        <Text as="p" variant="bodySm" fontWeight="semibold">
+                          High-Volume Store Optimization
+                        </Text>
+                        <Text as="p" variant="bodySm">
+                          Changes are processed efficiently in batches. For stores with 1000+ products, 
+                          visibility updates may take 30-60 seconds to complete. You'll see a confirmation 
+                          once processing is finished.
+                        </Text>
+                      </BlockStack>
+                    </InlineStack>
+                  </div>
+                </BlockStack>
+              </Card>
             </FormLayout>
           </Form>
         </Modal.Section>
@@ -4675,5 +5212,6 @@ export default function Index() {
         </button>
       </div>
     </Page>
+    </>
   );
 }

@@ -525,299 +525,47 @@
   }
 }
 
-/* Responsive accordion */
-@media (max-width: 768px) {
-  .help-accordion-header {
-    padding: 0.875rem 1rem;
-    font-size: 0.9rem;
-  }
-  
-  .help-accordion-scroll {
-    padding: 1rem;
-    max-height: 250px;
-  }
-  
-  .help-list {
-    padding-left: 1rem;
-  }
-}
-.reload-button {
-  background: #059669 !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 8px !important;
-  padding: 8px 16px !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  cursor: pointer !important;
-}
-
-.reload-button:hover {
-  background: #047857 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3) !important;
-}
-
-.reload-button:active {
-  transform: translateY(0) !important;
-}
-
-/* Enhanced Prominent Reload Button */
-.reload-button-prominent {
-  background: linear-gradient(45deg, #059669, #10b981) !important;
-  color: white !important;
-  border: 2px solid #047857 !important;
-  border-radius: 12px !important;
-  padding: 12px 20px !important;
-  font-weight: 600 !important;
-  font-size: 14px !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  cursor: pointer !important;
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25) !important;
-  position: relative !important;
-  overflow: hidden !important;
-}
-
-.reload-button-prominent::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: -100% !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
-  transition: left 0.5s !important;
-}
-
-.reload-button-prominent:hover {
-  background: linear-gradient(45deg, #047857, #059669) !important;
-  transform: translateY(-2px) scale(1.02) !important;
-  box-shadow: 0 8px 20px rgba(5, 150, 105, 0.4) !important;
-  border-color: #10b981 !important;
-}
-
-.reload-button-prominent:hover::before {
-  left: 100% !important;
-}
-
-.reload-button-prominent:active {
-  transform: translateY(-1px) scale(1.01) !important;
-  box-shadow: 0 4px 15px rgba(5, 150, 105, 0.35) !important;
-}
-
-.reload-button-prominent span {
-  font-weight: 600 !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Compact Reload Button for Header */
-.reload-button-compact {
-  background: #059669 !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 8px !important;
-  padding: 8px !important;
-  width: 36px !important;
-  height: 36px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2) !important;
-}
-
-.reload-button-compact:hover {
-  background: #047857 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3) !important;
-}
-
-.reload-button-compact:active {
-  transform: translateY(0) !important;
-  box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2) !important;
-}
-
-/* Floating Reload Button */
-.floating-reload-button {
-  position: fixed !important;
-  bottom: 24px !important;
-  right: 24px !important;
-  z-index: 1000 !important;
-  animation: fadeInUp 0.5s ease-out !important;
-}
-
-.floating-button {
-  background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 50px !important;
-  padding: 14px 20px !important;
-  font-weight: 600 !important;
-  font-size: 14px !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  cursor: pointer !important;
-  box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  backdrop-filter: blur(10px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-.floating-button:hover {
-  background: linear-gradient(135deg, #047857 0%, #059669 100%) !important;
-  transform: translateY(-3px) scale(1.05) !important;
-  box-shadow: 0 10px 30px rgba(5, 150, 105, 0.5) !important;
-}
-
-.floating-button:active {
-  transform: translateY(-1px) scale(1.02) !important;
-  box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4) !important;
-}
-
-.floating-button span {
-  font-weight: 600 !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0 !important;
-    transform: translateY(30px) !important;
-  }
-  to {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-  }
-}
-
-/* Help Button Styles */
-.help-button {
-  background: #3b82f6 !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 8px !important;
-  padding: 8px 16px !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  cursor: pointer !important;
-}
-
-.help-button:hover {
-  background: #2563eb !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3) !important;
-}
-
-.help-button:active {
-  transform: translateY(0) !important;
-}
-
-/* Out of Stock Product Cards */
-.oos-product-card {
-  transition: all 0.2s ease !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-  .help-content {
-    grid-template-columns: 1fr;
-  }
-  
-  .disclaimer-section,
-  .help-section {
-    margin: 16px 8px;
-    padding: 16px;
-  }
-}
-
-/* Compact Disclaimer Button */
-.disclaimer-button {
-  background: none !important;
-  border: none !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.5rem !important;
-  margin: 0 auto !important;
-  color: #6b7280 !important;
-  font-size: 0.875rem !important;
-  transition: all 0.2s ease !important;
-  padding: 0.5rem 1rem !important;
-  border-radius: 4px !important;
-}
-
-.disclaimer-button:hover {
-  color: #374151 !important;
-  background: rgba(107, 114, 128, 0.05) !important;
-}
-
-/* Loading Spinner Animation */
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Enhanced Show/Hide Toggle Text Links */
+/* Unified design for all toggle buttons */
 [data-toggle-button] .Polaris-Button {
-  background: none !important;
-  border: none !important;
-  border-radius: 0 !important;
-  padding: 8px 0 !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 50px !important; /* Rounded appearance */
+  padding: 8px 16px !important;
   font-weight: 500 !important;
   font-size: 14px !important;
-  color: #6b7280 !important;
+  color: #202223 !important;
   cursor: pointer !important;
-  position: relative !important;
   transition: all 0.2s ease !important;
-  box-shadow: none !important;
-  min-width: auto !important;
-  text-decoration: underline !important;
-  text-underline-offset: 2px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
 }
 
-/* Hover effects */
 [data-toggle-button] .Polaris-Button:hover {
-  color: #374151 !important;
-  background: none !important;
-  transform: none !important;
-  box-shadow: none !important;
-  text-decoration: underline !important;
+  background: rgba(246, 246, 247, 0.8) !important; /* Subtle hover effect */
+  border-color: #c9cccf !important;
+  color: #202223 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Active state */
 [data-toggle-button] .Polaris-Button:active {
-  color: #1f2937 !important;
-  transform: none !important;
-  box-shadow: none !important;
+  background: rgba(241, 242, 243, 0.9) !important;
+  border-color: #b5b5b5 !important;
+  color: #202223 !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* Icon styling */
 [data-toggle-button] .Polaris-Button .Polaris-Icon {
-  transition: transform 0.2s ease !important;
-  color: #1f2937 !important;
+  transition: none !important;
+  color: #6d7175 !important;
   width: 20px !important;
   height: 20px !important;
-  margin-right: 6px !important;
-  filter: brightness(0.8) !important;
+  margin-right: 0 !important;
 }
 
 [data-toggle-button] .Polaris-Button:hover .Polaris-Icon {
-  transform: scale(1.15) !important;
-  color: #111827 !important;
-  filter: brightness(0.7) !important;
+  color: #6d7175 !important;
 }
 
 /* Enhanced text styling */
@@ -841,4 +589,88 @@ img {
 
 img.loaded {
   opacity: 1;
+}
+
+/* Out of Stock Section Emphasis Animation */
+.oos-section-emphasis {
+  animation: emphasizeCard 2s ease-out !important;
+  transform: scale(1.02) !important;
+  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3) !important;
+  border: 2px solid #dc2626 !important;
+  border-radius: 12px !important;
+}
+
+@keyframes emphasizeCard {
+  0% {
+    transform: scale(1);
+    box-shadow: none;
+    border: 1px solid transparent;
+  }
+  20% {
+    transform: scale(1.03);
+    box-shadow: 0 12px 30px rgba(220, 38, 38, 0.4);
+    border: 2px solid #dc2626;
+  }
+  100% {
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
+    border: 2px solid #dc2626;
+  }
+}
+
+/* Pulsing effect for better visibility */
+.oos-section-pulse {
+  animation: pulseRed 1.5s ease-in-out infinite !important;
+}
+
+@keyframes pulseRed {
+  0% {
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.2);
+  }
+  50% {
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+  }
+  100% {
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.2);
+  }
+}
+
+/* Loading Spinner Animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Compact Disclaimer Button */
+.disclaimer-button {
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  margin: 0 auto !important;
+  color: #6b7280 !important;
+  font-size: 0.875rem !important;
+  transition: all 0.2s ease !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 4px !important;
+}
+
+.disclaimer-button:hover {
+  color: #374151 !important;
+  background: rgba(107, 114, 128, 0.05) !important;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .help-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .disclaimer-section,
+  .help-section {
+    margin: 16px 8px;
+    padding: 16px;
+  }
 }
