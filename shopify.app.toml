@@ -3,7 +3,7 @@
 client_id = "eb3e85d01989aa2d6f08378b8df5a312"
 name = "spector"
 handle = "spector-1"
-application_url = "https://forest-degree-pretty-set.trycloudflare.com"
+application_url = "https://conferences-parks-six-representations.trycloudflare.com"
 embedded = true
 
 [build]
@@ -26,7 +26,7 @@ api_version = "2025-07"
 scopes = "write_products,read_orders"
 
 [auth]
-redirect_urls = ["https://forest-degree-pretty-set.trycloudflare.com/auth/callback", "https://forest-degree-pretty-set.trycloudflare.com/auth/shopify/callback", "https://forest-degree-pretty-set.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://conferences-parks-six-representations.trycloudflare.com/auth/callback", "https://conferences-parks-six-representations.trycloudflare.com/auth/shopify/callback", "https://conferences-parks-six-representations.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false

@@ -1435,57 +1435,88 @@ export default function Index() {
       {/* Header with Logo and Title */}
       <div style={{ 
         background: '#f8fafc',
-        padding: '2rem',
+        padding: '1.5rem',
         marginBottom: '1.5rem',
         borderRadius: '8px',
         color: '#1e293b',
         border: '1px solid #e2e8f0'
       }}>
-        <InlineStack gap="400" blockAlign="center">
-          {/* Logo Placeholder */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1.5rem'
+        }}>
+          {/* Top Section - Logo, Title, and Status Indicators */}
           <div style={{
-            width: '60px',
-            height: '60px',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            borderRadius: '12px',
             display: 'flex',
+            flexWrap: 'wrap',
             alignItems: 'center',
-            justifyContent: 'center',
-            border: '2px solid rgba(59, 130, 246, 0.2)'
+            gap: '1rem',
+            justifyContent: 'space-between'
           }}>
-            <Icon source={InventoryIcon} tone="info" />
-          </div>
-          
-          {/* Title and Subtitle */}
-          <BlockStack gap="100">
-            <Text as="h1" variant="heading2xl" fontWeight="bold" tone="inherit">
-              Spector
-            </Text>
-            <Text as="p" variant="bodyLg" tone="subdued" fontWeight="medium">
-              Real-time stock monitoring, forecasting & multi-channel alerts
-            </Text>
-          </BlockStack>
-          
-          {/* Status Indicators and Action Buttons */}
-          <div style={{ marginLeft: 'auto' }}>
-            <InlineStack gap="300">
-              {/* Compact Reload Button - Icon Only */}
-              <button
+            {/* Logo and Title Group */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              flex: '1 1 auto',
+              minWidth: '280px'
+            }}>
+              {/* Logo Placeholder */}
+              <div style={{
+                width: '60px',
+                height: '60px',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '2px solid rgba(59, 130, 246, 0.2)',
+                flexShrink: 0
+              }}>
+                <Icon source={InventoryIcon} tone="info" />
+              </div>
+              
+              {/* Title and Subtitle */}
+              <div style={{ flex: '1' }}>
+                <Text as="h1" variant="heading2xl" fontWeight="bold" tone="inherit">
+                  Spector
+                </Text>
+                <Text as="p" variant="bodyLg" tone="subdued" fontWeight="medium">
+                  Real-time stock monitoring, forecasting & multi-channel alerts
+                </Text>
+              </div>
+            </div>
+            
+            {/* Status Indicators and Action Buttons */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              flexWrap: 'wrap',
+              justifyContent: 'flex-end'
+            }}>
+              {/* Compact Reload Button - Native Design */}
+              <Button
                 onClick={() => window.location.reload()}
-                className="reload-button reload-button-compact"
-                type="button"
-                title="Reload inventory data"
-              >
-                <Icon source={RefreshIcon} />
-              </button>
+                variant="tertiary"
+                size="medium"
+                icon={RefreshIcon}
+                accessibilityLabel="Reload inventory data"
+              />
               
               <div style={{
                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
                 padding: '0.5rem 1rem',
                 borderRadius: '20px',
-                border: '1px solid rgba(16, 185, 129, 0.2)'
+                border: '1px solid rgba(16, 185, 129, 0.2)',
+                whiteSpace: 'nowrap'
               }}>
-                <InlineStack gap="100" blockAlign="center">
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
                   <div style={{
                     width: '8px',
                     height: '8px',
@@ -1495,32 +1526,36 @@ export default function Index() {
                   <Text as="span" variant="bodySm" tone="success" fontWeight="medium">
                     Live Data
                   </Text>
-                </InlineStack>
+                </div>
               </div>
               
               <div style={{
                 backgroundColor: 'rgba(245, 158, 11, 0.1)',
                 padding: '0.5rem 1rem',
                 borderRadius: '20px',
-                border: '1px solid rgba(245, 158, 11, 0.2)'
+                border: '1px solid rgba(245, 158, 11, 0.2)',
+                whiteSpace: 'nowrap'
               }}>
-                <InlineStack gap="100" blockAlign="center">
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
                   <Icon source={AlertTriangleIcon} tone="warning" />
                   <Text as="span" variant="bodySm" tone="critical" fontWeight="medium">
                     {lowStockProducts.length + zeroStockProducts.length} Alerts
                   </Text>
-                </InlineStack>
+                </div>
               </div>
-            </InlineStack>
+            </div>
           </div>
-        </InlineStack>
-        
-        {/* Inventory Summary - Compact Header Version */}
-        <div style={{
-          marginTop: '1.5rem',
-          paddingTop: '1.5rem',
-          borderTop: '1px solid rgba(226, 232, 240, 0.6)'
-        }}>
+          
+          {/* Inventory Summary - Compact Header Version */}
+          <div style={{
+            marginTop: '1.5rem',
+            paddingTop: '1.5rem',
+            borderTop: '1px solid rgba(226, 232, 240, 0.6)'
+          }}>
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
@@ -1661,6 +1696,362 @@ export default function Index() {
                 Total Products
               </Text>
             </div>
+          </div>
+          
+          {/* Multi-Channel Alerts Configuration */}
+          <div style={{
+            marginTop: '1.5rem',
+            padding: '1.5rem',
+            background: '#ffffff',
+            borderRadius: '12px',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+          }}>
+            <BlockStack gap="400">
+              <InlineStack align="space-between" blockAlign="center">
+                <BlockStack gap="100">
+                  <Text as="h4" variant="headingMd" fontWeight="semibold">
+                    Multi-Channel Alert Notifications
+                  </Text>
+                  <Text as="p" variant="bodySm" tone="subdued">
+                    Enable and configure notifications across different platforms
+                  </Text>
+                </BlockStack>
+                
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <div style={{
+                    width: '8px',
+                    height: '8px',
+                    backgroundColor: (localNotificationSettings.email.enabled || localNotificationSettings.slack.enabled || localNotificationSettings.discord.enabled) ? '#10b981' : '#9ca3af',
+                    borderRadius: '50%'
+                  }}></div>
+                  <Text as="span" variant="bodySm" tone={
+                    (localNotificationSettings.email.enabled || localNotificationSettings.slack.enabled || localNotificationSettings.discord.enabled) ? 'success' : 'subdued'
+                  } fontWeight="medium">
+                    {(localNotificationSettings.email.enabled || localNotificationSettings.slack.enabled || localNotificationSettings.discord.enabled) ? 'Active' : 'Inactive'}
+                  </Text>
+                </div>
+              </InlineStack>
+              
+              {/* Direct Toggle Controls - More Visible and Accessible */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: '1rem'
+              }}>
+                {/* Email Channel */}
+                <div style={{
+                  padding: '1.25rem',
+                  background: localNotificationSettings.email.enabled ? 'rgba(16, 185, 129, 0.05)' : '#f8fafc',
+                  border: `1px solid ${localNotificationSettings.email.enabled ? 'rgba(16, 185, 129, 0.2)' : '#e2e8f0'}`,
+                  borderRadius: '8px'
+                }}>
+                  <BlockStack gap="300">
+                    <InlineStack align="space-between" blockAlign="center">
+                      <InlineStack gap="200" blockAlign="center">
+                        <div style={{
+                          width: '24px',
+                          height: '24px',
+                          backgroundColor: localNotificationSettings.email.enabled ? '#10b981' : '#9ca3af',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: 'white',
+                          fontWeight: 'bold',
+                          fontSize: '14px'
+                        }}>
+                          @
+                        </div>
+                        <Text as="p" variant="bodyMd" fontWeight="semibold">
+                          Email Notifications
+                        </Text>
+                      </InlineStack>
+                      
+                      {/* Toggle Switch */}
+                      <div
+                        style={{
+                          width: '40px',
+                          height: '20px',
+                          backgroundColor: localNotificationSettings.email.enabled ? '#10b981' : '#d1d5db',
+                          borderRadius: '10px',
+                          position: 'relative',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onClick={() => handleNotificationSettingChange('email', 'enabled', !localNotificationSettings.email.enabled)}
+                      >
+                        <div
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            backgroundColor: 'white',
+                            borderRadius: '50%',
+                            position: 'absolute',
+                            top: '2px',
+                            left: localNotificationSettings.email.enabled ? '22px' : '2px',
+                            transition: 'all 0.3s ease',
+                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)'
+                          }}
+                        />
+                      </div>
+                    </InlineStack>
+                    
+                    {localNotificationSettings.email.enabled && (
+                      <div style={{
+                        background: 'rgba(255, 255, 255, 0.8)',
+                        borderRadius: '6px',
+                        padding: '0.75rem'
+                      }}>
+                        <TextField
+                          label="Email Address"
+                          type="email"
+                          value={localNotificationSettings.email.recipientEmail || ''}
+                          onChange={(value) => handleNotificationSettingChange('email', 'recipientEmail', value)}
+                          placeholder="your@email.com"
+                          autoComplete="email"
+                        />
+                      </div>
+                    )}
+                    
+                    <Text as="p" variant="bodySm" tone="subdued">
+                      {localNotificationSettings.email.enabled ? 'Email alerts enabled' : 'Click to enable email notifications'}
+                    </Text>
+                  </BlockStack>
+                </div>
+                
+                {/* Slack Channel */}
+                <div style={{
+                  padding: '1.25rem',
+                  background: localNotificationSettings.slack.enabled ? 'rgba(16, 185, 129, 0.05)' : '#f8fafc',
+                  border: `1px solid ${localNotificationSettings.slack.enabled ? 'rgba(16, 185, 129, 0.2)' : '#e2e8f0'}`,
+                  borderRadius: '8px'
+                }}>
+                  <BlockStack gap="300">
+                    <InlineStack align="space-between" blockAlign="center">
+                      <InlineStack gap="200" blockAlign="center">
+                        <div style={{
+                          width: '24px',
+                          height: '24px',
+                          backgroundColor: localNotificationSettings.slack.enabled ? '#10b981' : '#9ca3af',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: 'white',
+                          fontWeight: 'bold',
+                          fontSize: '14px'
+                        }}>
+                          #
+                        </div>
+                        <Text as="p" variant="bodyMd" fontWeight="semibold">
+                          Slack Notifications
+                        </Text>
+                      </InlineStack>
+                      
+                      {/* Toggle Switch */}
+                      <div
+                        style={{
+                          width: '40px',
+                          height: '20px',
+                          backgroundColor: localNotificationSettings.slack.enabled ? '#10b981' : '#d1d5db',
+                          borderRadius: '10px',
+                          position: 'relative',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onClick={() => handleNotificationSettingChange('slack', 'enabled', !localNotificationSettings.slack.enabled)}
+                      >
+                        <div
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            backgroundColor: 'white',
+                            borderRadius: '50%',
+                            position: 'absolute',
+                            top: '2px',
+                            left: localNotificationSettings.slack.enabled ? '22px' : '2px',
+                            transition: 'all 0.3s ease',
+                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)'
+                          }}
+                        />
+                      </div>
+                    </InlineStack>
+                    
+                    {localNotificationSettings.slack.enabled && (
+                      <div style={{
+                        background: 'rgba(255, 255, 255, 0.8)',
+                        borderRadius: '6px',
+                        padding: '0.75rem'
+                      }}>
+                        <BlockStack gap="200">
+                          <TextField
+                            label="Webhook URL"
+                            type="url"
+                            value={localNotificationSettings.slack.webhookUrl || ''}
+                            onChange={(value) => handleNotificationSettingChange('slack', 'webhookUrl', value)}
+                            placeholder="https://hooks.slack.com/..."
+                            autoComplete="url"
+                          />
+                          <TextField
+                            label="Channel (optional)"
+                            value={localNotificationSettings.slack.channel || ''}
+                            onChange={(value) => handleNotificationSettingChange('slack', 'channel', value)}
+                            placeholder="#inventory-alerts"
+                            prefix="#"
+                            autoComplete="off"
+                          />
+                        </BlockStack>
+                      </div>
+                    )}
+                    
+                    <Text as="p" variant="bodySm" tone="subdued">
+                      {localNotificationSettings.slack.enabled ? 'Slack alerts enabled' : 'Click to enable Slack notifications'}
+                    </Text>
+                  </BlockStack>
+                </div>
+                
+                {/* Discord Channel */}
+                <div style={{
+                  padding: '1.25rem',
+                  background: localNotificationSettings.discord.enabled ? 'rgba(16, 185, 129, 0.05)' : '#f8fafc',
+                  border: `1px solid ${localNotificationSettings.discord.enabled ? 'rgba(16, 185, 129, 0.2)' : '#e2e8f0'}`,
+                  borderRadius: '8px'
+                }}>
+                  <BlockStack gap="300">
+                    <InlineStack align="space-between" blockAlign="center">
+                      <InlineStack gap="200" blockAlign="center">
+                        <div style={{
+                          width: '24px',
+                          height: '24px',
+                          backgroundColor: localNotificationSettings.discord.enabled ? '#10b981' : '#9ca3af',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: 'white',
+                          fontWeight: 'bold',
+                          fontSize: '14px'
+                        }}>
+                          D
+                        </div>
+                        <Text as="p" variant="bodyMd" fontWeight="semibold">
+                          Discord Notifications
+                        </Text>
+                      </InlineStack>
+                      
+                      {/* Toggle Switch */}
+                      <div
+                        style={{
+                          width: '40px',
+                          height: '20px',
+                          backgroundColor: localNotificationSettings.discord.enabled ? '#10b981' : '#d1d5db',
+                          borderRadius: '10px',
+                          position: 'relative',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onClick={() => handleNotificationSettingChange('discord', 'enabled', !localNotificationSettings.discord.enabled)}
+                      >
+                        <div
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            backgroundColor: 'white',
+                            borderRadius: '50%',
+                            position: 'absolute',
+                            top: '2px',
+                            left: localNotificationSettings.discord.enabled ? '22px' : '2px',
+                            transition: 'all 0.3s ease',
+                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)'
+                          }}
+                        />
+                      </div>
+                    </InlineStack>
+                    
+                    {localNotificationSettings.discord.enabled && (
+                      <div style={{
+                        background: 'rgba(255, 255, 255, 0.8)',
+                        borderRadius: '6px',
+                        padding: '0.75rem'
+                      }}>
+                        <BlockStack gap="200">
+                          <TextField
+                            label="Webhook URL"
+                            type="url"
+                            value={localNotificationSettings.discord.webhookUrl || ''}
+                            onChange={(value) => handleNotificationSettingChange('discord', 'webhookUrl', value)}
+                            placeholder="https://discord.com/api/webhooks/..."
+                            autoComplete="url"
+                          />
+                          <TextField
+                            label="Bot Username (optional)"
+                            value={localNotificationSettings.discord.username || ''}
+                            onChange={(value) => handleNotificationSettingChange('discord', 'username', value)}
+                            placeholder="Spector Bot"
+                            autoComplete="off"
+                          />
+                        </BlockStack>
+                      </div>
+                    )}
+                    
+                    <Text as="p" variant="bodySm" tone="subdued">
+                      {localNotificationSettings.discord.enabled ? 'Discord alerts enabled' : 'Click to enable Discord notifications'}
+                    </Text>
+                  </BlockStack>
+                </div>
+              </div>
+              
+              {/* Action Buttons */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                paddingTop: '1rem',
+                borderTop: '1px solid #e2e8f0'
+              }}>
+                <Text as="p" variant="bodySm" tone="subdued">
+                  Changes are saved automatically
+                </Text>
+                
+                <InlineStack gap="200">
+                  {/* Test Notifications Button */}
+                  {(localNotificationSettings.email.enabled || localNotificationSettings.slack.enabled || localNotificationSettings.discord.enabled) && (
+                    <Form method="post">
+                      <input type="hidden" name="actionType" value="testNotifications" />
+                      <input type="hidden" name="emailEnabled" value={localNotificationSettings.email.enabled.toString()} />
+                      <input type="hidden" name="recipientEmail" value={localNotificationSettings.email.recipientEmail} />
+                      <input type="hidden" name="slackEnabled" value={localNotificationSettings.slack.enabled.toString()} />
+                      <input type="hidden" name="slackWebhook" value={localNotificationSettings.slack.webhookUrl} />
+                      <input type="hidden" name="slackChannel" value={localNotificationSettings.slack.channel} />
+                      <input type="hidden" name="discordEnabled" value={localNotificationSettings.discord.enabled.toString()} />
+                      <input type="hidden" name="discordWebhook" value={localNotificationSettings.discord.webhookUrl} />
+                      <input type="hidden" name="discordUsername" value={localNotificationSettings.discord.username} />
+                      <Button
+                        submit
+                        variant="secondary"
+                        size="medium"
+                      >
+                        Test Notifications
+                      </Button>
+                    </Form>
+                  )}
+                  
+                  <Button
+                    onClick={() => setShowNotificationSettings(true)}
+                    variant="primary"
+                    size="medium"
+                  >
+                    Advanced Settings
+                  </Button>
+                </InlineStack>
+              </div>
+            </BlockStack>
+          </div>
           </div>
         </div>
         
@@ -1812,20 +2203,15 @@ export default function Index() {
                                     placeholder="5"
                                   />
                                 </div>
-                                <button
+                                <Button
                                   onClick={confirmThreshold}
                                   disabled={pendingThreshold === inventoryThreshold}
-                                  className="reload-button"
-                                  style={{
-                                    background: pendingThreshold !== inventoryThreshold ? '#059669' : '#d1d5db',
-                                    opacity: pendingThreshold !== inventoryThreshold ? 1 : 0.6,
-                                    cursor: pendingThreshold !== inventoryThreshold ? 'pointer' : 'not-allowed',
-                                    padding: '0.5rem 1rem',
-                                    fontSize: '12px'
-                                  }}
+                                  variant="primary"
+                                  size="medium"
+                                  tone={pendingThreshold !== inventoryThreshold ? "success" : undefined}
                                 >
                                   Apply
-                                </button>
+                                </Button>
                               </div>
                               
                               <Text as="p" variant="bodySm" tone="subdued">
@@ -1936,32 +2322,6 @@ export default function Index() {
                                     }}
                                   />
                                 </div>
-                              </div>
-
-                              {/* Multi-channel Settings */}
-                              <div style={{
-                                padding: '0.75rem',
-                                background: '#f8fafc',
-                                borderRadius: '6px',
-                                border: '1px solid #e2e8f0'
-                              }}>
-                                <InlineStack align="space-between" blockAlign="center">
-                                  <div>
-                                    <Text as="p" variant="bodySm" fontWeight="medium">
-                                      Multi-Channel Alerts
-                                    </Text>
-                                    <Text as="p" variant="bodySm" tone="subdued">
-                                      Email, Slack, Discord integration
-                                    </Text>
-                                  </div>
-                                  <Button 
-                                    onClick={() => setShowNotificationSettings(true)}
-                                    size="slim"
-                                    variant="tertiary"
-                                  >
-                                    Configure
-                                  </Button>
-                                </InlineStack>
                               </div>
                             </BlockStack>
                           </div>
@@ -2987,16 +3347,14 @@ export default function Index() {
                                     </InlineStack>
                                     
                                     {product.stock <= 5 && (
-                                      <button
+                                      <Button
                                         onClick={() => window.open(`https://admin.shopify.com/store/${shopInfo.myshopifyDomain?.replace('.myshopify.com', '')}/products/${product.id.replace('gid://shopify/Product/', '')}`, '_blank')}
-                                        className="reload-button"
-                                        style={{
-                                          background: '#dc2626',
-                                          color: 'white'
-                                        }}
+                                        variant="primary"
+                                        size="medium"
+                                        tone="critical"
                                       >
                                         Manage in Shopify
-                                      </button>
+                                      </Button>
                                     )}
                                   </InlineStack>
                                 </BlockStack>
@@ -5200,16 +5558,21 @@ export default function Index() {
       </Modal>
 
       {/* Floating Reload Button */}
-      <div className="floating-reload-button">
-        <button
+      <div style={{
+        position: 'fixed',
+        bottom: '2rem',
+        right: '2rem',
+        zIndex: 1000
+      }}>
+        <Button
           onClick={() => window.location.reload()}
-          className="floating-button"
-          type="button"
-          title="Reload all data"
+          variant="primary"
+          size="large"
+          icon={RefreshIcon}
+          accessibilityLabel="Reload all data"
         >
-          <Icon source={RefreshIcon} />
-          <span>Reload</span>
-        </button>
+          Reload
+        </Button>
       </div>
     </Page>
     </>
