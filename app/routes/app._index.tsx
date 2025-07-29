@@ -27,6 +27,7 @@ import "../styles/targeted-enhancements.css";
 import { ClientErrorFilter } from "../components/ClientErrorFilter";
 import {
   AlertTriangleIcon,
+  CheckboxIcon,
   InventoryIcon,
   EmailIcon,
   CalendarIcon,
@@ -733,7 +734,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }
   }
   
-  return { success: false, message: "Unknown action" };
+  return { success: false, message: "Action not supported" };
 };
 
 // Helper function to generate store URL for products
@@ -753,8 +754,10 @@ export default function Index() {
   
   // Notification settings modal state
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+  const [activeNotificationModal, setActiveNotificationModal] = useState<'email' | 'slack' | 'discord' | null>(null);
   const [showAlertSettings, setShowAlertSettings] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
+  const [bulkEditMode, setBulkEditMode] = useState({ outOfStock: false, lowStock: false });
   const [localNotificationSettings, setLocalNotificationSettings] = useState(notificationSettings);
   
   // Storefront visibility settings modal state
@@ -1024,7 +1027,7 @@ export default function Index() {
       console.error('Error fetching analysis:', error);
       setAnalysisData({
         error: 'Unable to fetch analysis data. Please try again later.',
-        productName: product.title || 'Unknown Product'
+        productName: product.title || 'Product Name Not Available'
       });
     } finally {
       setIsLoadingAnalysis(false);
@@ -1146,7 +1149,7 @@ export default function Index() {
   // Helper function to format forecast badge
   const getForecastBadge = (product: Product) => {
     if (!product.forecast || product.forecast.daysUntilStockout === null) {
-      return <Badge>Unknown</Badge>;
+      return <Badge>No Data</Badge>;
     }
 
     const days = product.forecast.daysUntilStockout;
@@ -1698,23 +1701,23 @@ export default function Index() {
             </div>
           </div>
           
-          {/* Multi-Channel Alerts Configuration */}
+          {/* Notification Settings - Simplified */}
           <div style={{
             marginTop: '1.5rem',
-            padding: '1.5rem',
+            padding: '1.25rem',
             background: '#ffffff',
-            borderRadius: '12px',
+            borderRadius: '10px',
             border: '1px solid #e2e8f0',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
           }}>
-            <BlockStack gap="400">
+            <BlockStack gap="300">
               <InlineStack align="space-between" blockAlign="center">
                 <BlockStack gap="100">
                   <Text as="h4" variant="headingMd" fontWeight="semibold">
-                    Multi-Channel Alert Notifications
+                    Notification Settings
                   </Text>
                   <Text as="p" variant="bodySm" tone="subdued">
-                    Enable and configure notifications across different platforms
+                    Configure alerts for Email, Slack, and Discord
                   </Text>
                 </BlockStack>
                 
@@ -1737,318 +1740,53 @@ export default function Index() {
                 </div>
               </InlineStack>
               
-              {/* Direct Toggle Controls - More Visible and Accessible */}
+              {/* Simple Enable Buttons */}
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                gap: '1rem'
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '1rem',
+                padding: '1rem',
+                background: '#f8fafc',
+                borderRadius: '8px'
               }}>
-                {/* Email Channel */}
-                <div style={{
-                  padding: '1.25rem',
-                  background: localNotificationSettings.email.enabled ? 'rgba(16, 185, 129, 0.05)' : '#f8fafc',
-                  border: `1px solid ${localNotificationSettings.email.enabled ? 'rgba(16, 185, 129, 0.2)' : '#e2e8f0'}`,
-                  borderRadius: '8px'
-                }}>
-                  <BlockStack gap="300">
-                    <InlineStack align="space-between" blockAlign="center">
-                      <InlineStack gap="200" blockAlign="center">
-                        <div style={{
-                          width: '24px',
-                          height: '24px',
-                          backgroundColor: localNotificationSettings.email.enabled ? '#10b981' : '#9ca3af',
-                          borderRadius: '50%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'white',
-                          fontWeight: 'bold',
-                          fontSize: '14px'
-                        }}>
-                          @
-                        </div>
-                        <Text as="p" variant="bodyMd" fontWeight="semibold">
-                          Email Notifications
-                        </Text>
-                      </InlineStack>
-                      
-                      {/* Toggle Switch */}
-                      <div
-                        style={{
-                          width: '40px',
-                          height: '20px',
-                          backgroundColor: localNotificationSettings.email.enabled ? '#10b981' : '#d1d5db',
-                          borderRadius: '10px',
-                          position: 'relative',
-                          cursor: 'pointer',
-                          transition: 'all 0.3s ease'
-                        }}
-                        onClick={() => handleNotificationSettingChange('email', 'enabled', !localNotificationSettings.email.enabled)}
-                      >
-                        <div
-                          style={{
-                            width: '16px',
-                            height: '16px',
-                            backgroundColor: 'white',
-                            borderRadius: '50%',
-                            position: 'absolute',
-                            top: '2px',
-                            left: localNotificationSettings.email.enabled ? '22px' : '2px',
-                            transition: 'all 0.3s ease',
-                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)'
-                          }}
-                        />
-                      </div>
-                    </InlineStack>
-                    
-                    {localNotificationSettings.email.enabled && (
-                      <div style={{
-                        background: 'rgba(255, 255, 255, 0.8)',
-                        borderRadius: '6px',
-                        padding: '0.75rem'
-                      }}>
-                        <TextField
-                          label="Email Address"
-                          type="email"
-                          value={localNotificationSettings.email.recipientEmail || ''}
-                          onChange={(value) => handleNotificationSettingChange('email', 'recipientEmail', value)}
-                          placeholder="your@email.com"
-                          autoComplete="email"
-                        />
-                      </div>
-                    )}
-                    
-                    <Text as="p" variant="bodySm" tone="subdued">
-                      {localNotificationSettings.email.enabled ? 'Email alerts enabled' : 'Click to enable email notifications'}
-                    </Text>
-                  </BlockStack>
-                </div>
-                
-                {/* Slack Channel */}
-                <div style={{
-                  padding: '1.25rem',
-                  background: localNotificationSettings.slack.enabled ? 'rgba(16, 185, 129, 0.05)' : '#f8fafc',
-                  border: `1px solid ${localNotificationSettings.slack.enabled ? 'rgba(16, 185, 129, 0.2)' : '#e2e8f0'}`,
-                  borderRadius: '8px'
-                }}>
-                  <BlockStack gap="300">
-                    <InlineStack align="space-between" blockAlign="center">
-                      <InlineStack gap="200" blockAlign="center">
-                        <div style={{
-                          width: '24px',
-                          height: '24px',
-                          backgroundColor: localNotificationSettings.slack.enabled ? '#10b981' : '#9ca3af',
-                          borderRadius: '50%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'white',
-                          fontWeight: 'bold',
-                          fontSize: '14px'
-                        }}>
-                          #
-                        </div>
-                        <Text as="p" variant="bodyMd" fontWeight="semibold">
-                          Slack Notifications
-                        </Text>
-                      </InlineStack>
-                      
-                      {/* Toggle Switch */}
-                      <div
-                        style={{
-                          width: '40px',
-                          height: '20px',
-                          backgroundColor: localNotificationSettings.slack.enabled ? '#10b981' : '#d1d5db',
-                          borderRadius: '10px',
-                          position: 'relative',
-                          cursor: 'pointer',
-                          transition: 'all 0.3s ease'
-                        }}
-                        onClick={() => handleNotificationSettingChange('slack', 'enabled', !localNotificationSettings.slack.enabled)}
-                      >
-                        <div
-                          style={{
-                            width: '16px',
-                            height: '16px',
-                            backgroundColor: 'white',
-                            borderRadius: '50%',
-                            position: 'absolute',
-                            top: '2px',
-                            left: localNotificationSettings.slack.enabled ? '22px' : '2px',
-                            transition: 'all 0.3s ease',
-                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)'
-                          }}
-                        />
-                      </div>
-                    </InlineStack>
-                    
-                    {localNotificationSettings.slack.enabled && (
-                      <div style={{
-                        background: 'rgba(255, 255, 255, 0.8)',
-                        borderRadius: '6px',
-                        padding: '0.75rem'
-                      }}>
-                        <BlockStack gap="200">
-                          <TextField
-                            label="Webhook URL"
-                            type="url"
-                            value={localNotificationSettings.slack.webhookUrl || ''}
-                            onChange={(value) => handleNotificationSettingChange('slack', 'webhookUrl', value)}
-                            placeholder="https://hooks.slack.com/..."
-                            autoComplete="url"
-                          />
-                          <TextField
-                            label="Channel (optional)"
-                            value={localNotificationSettings.slack.channel || ''}
-                            onChange={(value) => handleNotificationSettingChange('slack', 'channel', value)}
-                            placeholder="#inventory-alerts"
-                            prefix="#"
-                            autoComplete="off"
-                          />
-                        </BlockStack>
-                      </div>
-                    )}
-                    
-                    <Text as="p" variant="bodySm" tone="subdued">
-                      {localNotificationSettings.slack.enabled ? 'Slack alerts enabled' : 'Click to enable Slack notifications'}
-                    </Text>
-                  </BlockStack>
-                </div>
-                
-                {/* Discord Channel */}
-                <div style={{
-                  padding: '1.25rem',
-                  background: localNotificationSettings.discord.enabled ? 'rgba(16, 185, 129, 0.05)' : '#f8fafc',
-                  border: `1px solid ${localNotificationSettings.discord.enabled ? 'rgba(16, 185, 129, 0.2)' : '#e2e8f0'}`,
-                  borderRadius: '8px'
-                }}>
-                  <BlockStack gap="300">
-                    <InlineStack align="space-between" blockAlign="center">
-                      <InlineStack gap="200" blockAlign="center">
-                        <div style={{
-                          width: '24px',
-                          height: '24px',
-                          backgroundColor: localNotificationSettings.discord.enabled ? '#10b981' : '#9ca3af',
-                          borderRadius: '50%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'white',
-                          fontWeight: 'bold',
-                          fontSize: '14px'
-                        }}>
-                          D
-                        </div>
-                        <Text as="p" variant="bodyMd" fontWeight="semibold">
-                          Discord Notifications
-                        </Text>
-                      </InlineStack>
-                      
-                      {/* Toggle Switch */}
-                      <div
-                        style={{
-                          width: '40px',
-                          height: '20px',
-                          backgroundColor: localNotificationSettings.discord.enabled ? '#10b981' : '#d1d5db',
-                          borderRadius: '10px',
-                          position: 'relative',
-                          cursor: 'pointer',
-                          transition: 'all 0.3s ease'
-                        }}
-                        onClick={() => handleNotificationSettingChange('discord', 'enabled', !localNotificationSettings.discord.enabled)}
-                      >
-                        <div
-                          style={{
-                            width: '16px',
-                            height: '16px',
-                            backgroundColor: 'white',
-                            borderRadius: '50%',
-                            position: 'absolute',
-                            top: '2px',
-                            left: localNotificationSettings.discord.enabled ? '22px' : '2px',
-                            transition: 'all 0.3s ease',
-                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)'
-                          }}
-                        />
-                      </div>
-                    </InlineStack>
-                    
-                    {localNotificationSettings.discord.enabled && (
-                      <div style={{
-                        background: 'rgba(255, 255, 255, 0.8)',
-                        borderRadius: '6px',
-                        padding: '0.75rem'
-                      }}>
-                        <BlockStack gap="200">
-                          <TextField
-                            label="Webhook URL"
-                            type="url"
-                            value={localNotificationSettings.discord.webhookUrl || ''}
-                            onChange={(value) => handleNotificationSettingChange('discord', 'webhookUrl', value)}
-                            placeholder="https://discord.com/api/webhooks/..."
-                            autoComplete="url"
-                          />
-                          <TextField
-                            label="Bot Username (optional)"
-                            value={localNotificationSettings.discord.username || ''}
-                            onChange={(value) => handleNotificationSettingChange('discord', 'username', value)}
-                            placeholder="Spector Bot"
-                            autoComplete="off"
-                          />
-                        </BlockStack>
-                      </div>
-                    )}
-                    
-                    <Text as="p" variant="bodySm" tone="subdued">
-                      {localNotificationSettings.discord.enabled ? 'Discord alerts enabled' : 'Click to enable Discord notifications'}
-                    </Text>
-                  </BlockStack>
-                </div>
-              </div>
-              
-              {/* Action Buttons */}
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                paddingTop: '1rem',
-                borderTop: '1px solid #e2e8f0'
-              }}>
-                <Text as="p" variant="bodySm" tone="subdued">
-                  Changes are saved automatically
-                </Text>
-                
-                <InlineStack gap="200">
-                  {/* Test Notifications Button */}
-                  {(localNotificationSettings.email.enabled || localNotificationSettings.slack.enabled || localNotificationSettings.discord.enabled) && (
-                    <Form method="post">
-                      <input type="hidden" name="actionType" value="testNotifications" />
-                      <input type="hidden" name="emailEnabled" value={localNotificationSettings.email.enabled.toString()} />
-                      <input type="hidden" name="recipientEmail" value={localNotificationSettings.email.recipientEmail} />
-                      <input type="hidden" name="slackEnabled" value={localNotificationSettings.slack.enabled.toString()} />
-                      <input type="hidden" name="slackWebhook" value={localNotificationSettings.slack.webhookUrl} />
-                      <input type="hidden" name="slackChannel" value={localNotificationSettings.slack.channel} />
-                      <input type="hidden" name="discordEnabled" value={localNotificationSettings.discord.enabled.toString()} />
-                      <input type="hidden" name="discordWebhook" value={localNotificationSettings.discord.webhookUrl} />
-                      <input type="hidden" name="discordUsername" value={localNotificationSettings.discord.username} />
-                      <Button
-                        submit
-                        variant="secondary"
-                        size="medium"
-                      >
-                        Test Notifications
-                      </Button>
-                    </Form>
-                  )}
-                  
-                  <Button
-                    onClick={() => setShowNotificationSettings(true)}
-                    variant="primary"
-                    size="medium"
-                  >
-                    Advanced Settings
-                  </Button>
-                </InlineStack>
+                {/* Email */}
+                <Button
+                  onClick={() => {
+                    setActiveNotificationModal('email');
+                    setShowNotificationSettings(true);
+                  }}
+                  variant={localNotificationSettings.email.enabled ? "primary" : "secondary"}
+                  size="large"
+                  fullWidth
+                >
+                  @ Email
+                </Button>
+
+                {/* Slack */}
+                <Button
+                  onClick={() => {
+                    setActiveNotificationModal('slack');
+                    setShowNotificationSettings(true);
+                  }}
+                  variant={localNotificationSettings.slack.enabled ? "primary" : "secondary"}
+                  size="large"
+                  fullWidth
+                >
+                  # Slack
+                </Button>
+
+                {/* Discord */}
+                <Button
+                  onClick={() => {
+                    setActiveNotificationModal('discord');
+                    setShowNotificationSettings(true);
+                  }}
+                  variant={localNotificationSettings.discord.enabled ? "primary" : "secondary"}
+                  size="large"
+                  fullWidth
+                >
+                  D Discord
+                </Button>
               </div>
             </BlockStack>
           </div>
@@ -2117,10 +1855,10 @@ export default function Index() {
                       <InlineStack align="space-between" blockAlign="center">
                         <BlockStack gap="100">
                           <Text as="h4" variant="headingMd" fontWeight="semibold">
-                            Storefront Visibility & Alert Manager
+                            Storefront Visibility Manager
                           </Text>
                           <Text as="p" variant="bodySm" tone="subdued">
-                            Manage product visibility and configure comprehensive alert notifications
+                            Automatically control product visibility on your storefront based on inventory levels
                           </Text>
                         </BlockStack>
                         
@@ -2220,7 +1958,7 @@ export default function Index() {
                             </BlockStack>
                           </div>
 
-                          {/* Notification Types */}
+                          {/* Storefront Visibility Settings */}
                           <div style={{
                             background: '#ffffff',
                             border: '1px solid #e2e8f0',
@@ -2229,10 +1967,10 @@ export default function Index() {
                           }}>
                             <BlockStack gap="300">
                               <Text as="h5" variant="headingSm" fontWeight="semibold">
-                                Notification Configuration
+                                Product Hiding Rules
                               </Text>
                               
-                              {/* Out of Stock Notifications */}
+                              {/* Auto-hide Out of Stock Products */}
                               <div style={{ 
                                 display: 'flex', 
                                 justifyContent: 'space-between', 
@@ -2244,23 +1982,30 @@ export default function Index() {
                               }}>
                                 <div>
                                   <Text as="p" variant="bodySm" fontWeight="medium">
-                                    Out of Stock Alerts
+                                    Auto-Hide Out of Stock Products
                                   </Text>
                                   <Text as="p" variant="bodySm" tone="subdued">
-                                    Zero inventory notifications
+                                    Automatically hide products with 0 inventory
                                   </Text>
                                 </div>
                                 <div
                                   style={{
                                     width: '36px',
                                     height: '18px',
-                                    backgroundColor: oosEmailEnabled ? '#dc2626' : '#d1d5db',
+                                    backgroundColor: localVisibilitySettings.hideOutOfStock ? '#dc2626' : '#d1d5db',
                                     borderRadius: '9px',
                                     position: 'relative',
                                     cursor: 'pointer',
                                     transition: 'all 0.3s ease'
                                   }}
-                                  onClick={() => handleOosToggle(!oosEmailEnabled)}
+                                  onClick={() => {
+                                    const newSettings = { 
+                                      ...localVisibilitySettings, 
+                                      hideOutOfStock: !localVisibilitySettings.hideOutOfStock 
+                                    };
+                                    setLocalVisibilitySettings(newSettings);
+                                    handleVisibilitySettingChange('hideOutOfStock', !localVisibilitySettings.hideOutOfStock);
+                                  }}
                                 >
                                   <div
                                     style={{
@@ -2270,7 +2015,7 @@ export default function Index() {
                                       borderRadius: '50%',
                                       position: 'absolute',
                                       top: '2px',
-                                      left: oosEmailEnabled ? '20px' : '2px',
+                                      left: localVisibilitySettings.hideOutOfStock ? '20px' : '2px',
                                       transition: 'all 0.3s ease',
                                       boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
                                     }}
@@ -2278,35 +2023,42 @@ export default function Index() {
                                 </div>
                               </div>
 
-                              {/* Critical Level Notifications */}
+                              {/* Auto-show When Restocked */}
                               <div style={{ 
                                 display: 'flex', 
                                 justifyContent: 'space-between', 
                                 alignItems: 'center',
                                 padding: '0.75rem',
-                                background: '#fffbeb',
+                                background: '#f0fdf4',
                                 borderRadius: '6px',
-                                border: '1px solid #fcd34d'
+                                border: '1px solid #86efac'
                               }}>
                                 <div>
                                   <Text as="p" variant="bodySm" fontWeight="medium">
-                                    Critical Level Alerts
+                                    Auto-Show When Restocked
                                   </Text>
                                   <Text as="p" variant="bodySm" tone="subdued">
-                                    ≤{Math.floor(inventoryThreshold / 2)} units threshold
+                                    Automatically restore visibility when inventory is replenished
                                   </Text>
                                 </div>
                                 <div
                                   style={{
                                     width: '36px',
                                     height: '18px',
-                                    backgroundColor: criticalEmailEnabled ? '#f59e0b' : '#d1d5db',
+                                    backgroundColor: localVisibilitySettings.showWhenRestocked ? '#10b981' : '#d1d5db',
                                     borderRadius: '9px',
                                     position: 'relative',
                                     cursor: 'pointer',
                                     transition: 'all 0.3s ease'
                                   }}
-                                  onClick={() => handleCriticalToggle(!criticalEmailEnabled)}
+                                  onClick={() => {
+                                    const newSettings = { 
+                                      ...localVisibilitySettings, 
+                                      showWhenRestocked: !localVisibilitySettings.showWhenRestocked 
+                                    };
+                                    setLocalVisibilitySettings(newSettings);
+                                    handleVisibilitySettingChange('showWhenRestocked', !localVisibilitySettings.showWhenRestocked);
+                                  }}
                                 >
                                   <div
                                     style={{
@@ -2316,126 +2068,24 @@ export default function Index() {
                                       borderRadius: '50%',
                                       position: 'absolute',
                                       top: '2px',
-                                      left: criticalEmailEnabled ? '20px' : '2px',
+                                      left: localVisibilitySettings.showWhenRestocked ? '20px' : '2px',
                                       transition: 'all 0.3s ease',
                                       boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
                                     }}
                                   />
                                 </div>
                               </div>
-                            </BlockStack>
-                          </div>
-                        </div>
-                      )}
 
-                      {/* Quick Actions - Simplified and Clean */}
-                      {localVisibilitySettings.enabled && (
-                        <div style={{
-                          display: 'grid',
-                          gridTemplateColumns: 'repeat(3, 1fr)',
-                          gap: '1rem',
-                          padding: '1rem',
-                          background: 'rgba(255, 255, 255, 0.9)',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(226, 232, 240, 0.5)'
-                        }}>
-                          {/* Bulk Hide Out of Stock */}
-                          <div style={{
-                            textAlign: 'center',
-                            padding: '1rem',
-                            background: '#ffffff',
-                            border: '1px solid #fecaca',
-                            borderRadius: '6px'
-                          }}>
-                            <BlockStack gap="200">
-                              <Text as="p" variant="bodyMd" fontWeight="semibold">
-                                Hide Out of Stock
-                              </Text>
-                              <Text as="p" variant="bodySm" tone="subdued">
-                                {zeroStockProducts.length} products ready to hide
-                              </Text>
-                              <Form method="post">
-                                <input type="hidden" name="actionType" value="updateOutOfStockVisibility" />
-                                <Button 
-                                  submit 
-                                  size="medium" 
-                                  variant="primary" 
-                                  tone="critical"
-                                  disabled={zeroStockProducts.length === 0}
-                                  fullWidth
-                                >
-                                  {zeroStockProducts.length === 0 ? 'No Products to Hide' : `Hide ${zeroStockProducts.length} Products`}
-                                </Button>
-                              </Form>
-                            </BlockStack>
-                          </div>
-
-                          {/* Bulk Hide Selected */}
-                          <div style={{
-                            textAlign: 'center',
-                            padding: '1rem',
-                            background: '#ffffff',
-                            border: '1px solid #fcd34d',
-                            borderRadius: '6px',
-                            opacity: selectedProducts.size > 0 ? 1 : 0.5
-                          }}>
-                            <BlockStack gap="200">
-                              <Text as="p" variant="bodyMd" fontWeight="semibold">
-                                Hide Selected
-                              </Text>
-                              <Text as="p" variant="bodySm" tone="subdued">
-                                {selectedProducts.size} products selected
-                              </Text>
-                              <Form method="post">
-                                <input type="hidden" name="actionType" value="hideSelectedProducts" />
-                                <input type="hidden" name="selectedProductIds" value={Array.from(selectedProducts).join(',')} />
-                                <Button 
-                                  submit 
-                                  size="medium" 
-                                  variant="primary" 
-                                  tone="critical"
-                                  disabled={selectedProducts.size === 0}
-                                  fullWidth
-                                >
-                                  {selectedProducts.size === 0 ? 'Select Products First' : `Hide ${selectedProducts.size} Selected`}
-                                </Button>
-                              </Form>
-                            </BlockStack>
-                          </div>
-
-                          {/* Quick Select */}
-                          <div style={{
-                            textAlign: 'center',
-                            padding: '1rem',
-                            background: '#ffffff',
-                            border: '1px solid #93c5fd',
-                            borderRadius: '6px'
-                          }}>
-                            <BlockStack gap="200">
-                              <Text as="p" variant="bodyMd" fontWeight="semibold">
-                                Quick Select
-                              </Text>
-                              <Text as="p" variant="bodySm" tone="subdued">
-                                Batch select products
-                              </Text>
-                              <InlineStack gap="100">
-                                <Button 
-                                  onClick={selectAllOOSProducts}
-                                  size="slim" 
-                                  variant="secondary"
-                                  disabled={zeroStockProducts.length === 0}
-                                >
-                                  All OOS
-                                </Button>
-                                <Button 
-                                  onClick={clearSelection}
-                                  size="slim" 
-                                  variant="plain"
-                                  disabled={selectedProducts.size === 0}
-                                >
-                                  Clear
-                                </Button>
-                              </InlineStack>
+                              <div style={{
+                                padding: '0.75rem',
+                                background: '#f8fafc',
+                                borderRadius: '6px',
+                                border: '1px solid #e2e8f0'
+                              }}>
+                                <Text as="p" variant="bodySm" tone="subdued">
+                                  💡 For low stock products, use the "Bulk Edit" buttons below each section to manually hide/show products as needed.
+                                </Text>
+                              </div>
                             </BlockStack>
                           </div>
                         </div>
@@ -2458,8 +2108,8 @@ export default function Index() {
                             }}></div>
                             <Text as="p" variant="bodyMd" fontWeight="medium">
                               {localVisibilitySettings.enabled 
-                                ? 'System active - Managing visibility and alerts automatically' 
-                                : 'System inactive - Enable to start managing products'
+                                ? 'Storefront visibility management active' 
+                                : 'Storefront visibility management inactive - Enable to start managing products'
                               }
                             </Text>
                           </InlineStack>
@@ -2468,7 +2118,7 @@ export default function Index() {
                         {localVisibilitySettings.enabled && (
                           <div style={{ marginTop: '0.75rem' }}>
                             <Text as="p" variant="bodySm" tone="subdued">
-                              Monitoring {products.length} products • {oosEmailEnabled ? 'Out of stock alerts enabled' : 'Out of stock alerts disabled'} • {criticalEmailEnabled ? 'Critical level alerts enabled' : 'Critical level alerts disabled'}
+                              Managing {products.length} products • {localVisibilitySettings.hideOutOfStock ? 'Out of stock products auto-hidden' : 'Out of stock products visible'} • {localVisibilitySettings.showWhenRestocked ? 'Auto-restore when restocked' : 'Manual restore required'}
                             </Text>
                           </div>
                         )}
@@ -2499,8 +2149,110 @@ export default function Index() {
                           </div>
                         )}
                       </InlineStack>
-                      <Badge tone="critical">{zeroStockProducts.length}</Badge>
+                      <InlineStack gap="200">
+                        <Badge tone="critical">{zeroStockProducts.length}</Badge>
+                        {zeroStockProducts.length > 0 && (
+                          <Button
+                            onClick={() => {
+                              setBulkEditMode({ ...bulkEditMode, outOfStock: !bulkEditMode.outOfStock });
+                              // Clear selections when toggling off
+                              if (bulkEditMode.outOfStock) {
+                                setSelectedProducts(new Set());
+                              }
+                            }}
+                            variant={bulkEditMode.outOfStock ? "primary" : "secondary"}
+                            size="medium"
+                            tone={bulkEditMode.outOfStock ? "critical" : undefined}
+                          >
+                            {bulkEditMode.outOfStock ? 'Exit Bulk Edit' : 'Bulk Edit'}
+                          </Button>
+                        )}
+                      </InlineStack>
                     </InlineStack>
+
+                    {/* Bulk Edit Controls for Out of Stock - Only show when enabled */}
+                    {bulkEditMode.outOfStock && zeroStockProducts.length > 0 && (
+                      <div style={{
+                        background: 'linear-gradient(135deg, #fef2f2 0%, #fecaca 100%)',
+                        border: '2px solid #f87171',
+                        borderRadius: '12px',
+                        padding: '1.25rem',
+                        marginBottom: '1rem',
+                        boxShadow: '0 4px 6px rgba(248, 113, 113, 0.1)'
+                      }}>
+                        <BlockStack gap="300">
+                          <InlineStack align="space-between" blockAlign="center">
+                            <InlineStack gap="300" blockAlign="center">
+                              <div style={{
+                                width: '32px',
+                                height: '32px',
+                                backgroundColor: '#dc2626',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}>
+                                <Icon source={CheckboxIcon} tone="base" />
+                              </div>
+                              <BlockStack gap="100">
+                                <Text as="h4" variant="headingSm" fontWeight="semibold" tone="critical">
+                                  Bulk Actions - Out of Stock Products
+                                </Text>
+                                <Text as="p" variant="bodySm" tone="subdued">
+                                  Select and manage multiple out of stock products at once
+                                </Text>
+                              </BlockStack>
+                            </InlineStack>
+                            <InlineStack gap="200">
+                              <Button
+                                onClick={() => {
+                                  const allOutOfStockIds = zeroStockProducts.map((p: Product) => p.id);
+                                  const newSelected = new Set(selectedProducts);
+                                  const selectedOutOfStock = allOutOfStockIds.filter((id: string) => newSelected.has(id));
+                                  
+                                  if (selectedOutOfStock.length === allOutOfStockIds.length) {
+                                    // Deselect all out of stock
+                                    allOutOfStockIds.forEach((id: string) => newSelected.delete(id));
+                                  } else {
+                                    // Select all out of stock
+                                    allOutOfStockIds.forEach((id: string) => newSelected.add(id));
+                                  }
+                                  setSelectedProducts(newSelected);
+                                }}
+                                variant="tertiary"
+                                size="medium"
+                              >
+                                {zeroStockProducts.every((p: Product) => selectedProducts.has(p.id)) ? 'Deselect All' : 'Select All'}
+                              </Button>
+                              {Array.from(selectedProducts).filter((id: string) => zeroStockProducts.some((p: Product) => p.id === id)).length > 0 && (
+                                <Form method="post" style={{ display: 'inline' }}>
+                                  <input type="hidden" name="actionType" value="hideSelectedProducts" />
+                                  <input type="hidden" name="selectedProductIds" value={Array.from(selectedProducts).filter((id: string) => zeroStockProducts.some((p: Product) => p.id === id)).join(',')} />
+                                  <Button
+                                    submit
+                                    variant="primary"
+                                    tone="critical"
+                                    size="medium"
+                                  >
+                                    Hide {Array.from(selectedProducts).filter((id: string) => zeroStockProducts.some((p: Product) => p.id === id)).length.toString()} Selected
+                                  </Button>
+                                </Form>
+                              )}
+                            </InlineStack>
+                          </InlineStack>
+                          <div style={{
+                            padding: '0.75rem',
+                            background: 'rgba(255, 255, 255, 0.8)',
+                            borderRadius: '8px',
+                            border: '1px solid rgba(220, 38, 38, 0.2)'
+                          }}>
+                            <Text as="p" variant="bodySm" tone="subdued">
+                              💡 <strong>{Array.from(selectedProducts).filter((id: string) => zeroStockProducts.some((p: Product) => p.id === id)).length}</strong> of <strong>{zeroStockProducts.length}</strong> out of stock products selected. Click products below to select/deselect them.
+                            </Text>
+                          </div>
+                        </BlockStack>
+                      </div>
+                    )}
                   
                   {zeroStockProducts.length === 0 ? (
                     <EmptyState
@@ -2524,10 +2276,10 @@ export default function Index() {
                         style={{ 
                           maxHeight: '350px',
                           overflowY: 'auto',
-                          border: '1px solid #e2e8f0',
+                          border: '1px solid #fecaca',
                           borderRadius: '8px',
                           padding: '1rem',
-                          background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+                          background: '#fef2f2',
                           transition: 'all 0.3s ease'
                         }}
                       >
@@ -2538,7 +2290,7 @@ export default function Index() {
                         }}>
                           {zeroStockProducts.map((product: Product) => (
                             <div key={product.id} className="product-card-hover" style={{ 
-                              background: '#ffffff',
+                              background: '#fef7f7',
                               border: '1px solid #fecaca',
                               borderRadius: '8px',
                               padding: '0.75rem',
@@ -2547,8 +2299,8 @@ export default function Index() {
                             }}
                             onClick={() => handleProductClick(product.id)}
                             onMouseEnter={(e) => {
-                              e.currentTarget.style.borderColor = '#dc2626';
-                              e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.2)';
+                              e.currentTarget.style.borderColor = '#f87171';
+                              e.currentTarget.style.boxShadow = '0 2px 8px rgba(248, 113, 113, 0.15)';
                               e.currentTarget.style.transform = 'translateY(-1px)';
                             }}
                             onMouseLeave={(e) => {
@@ -2557,17 +2309,19 @@ export default function Index() {
                               e.currentTarget.style.transform = 'translateY(0)';
                             }}>
                               <InlineStack gap="300" blockAlign="center">
-                                {/* Selection Checkbox */}
-                                <div 
-                                  onClick={(e) => e.stopPropagation()}
-                                  style={{ flexShrink: 0 }}
-                                >
-                                  <Checkbox 
-                                    checked={selectedProducts.has(product.id)}
-                                    onChange={() => toggleProductSelection(product.id)}
-                                    label=""
-                                  />
-                                </div>
+                                {/* Selection Checkbox - Only show in bulk edit mode */}
+                                {bulkEditMode.outOfStock && (
+                                  <div 
+                                    onClick={(e) => e.stopPropagation()}
+                                    style={{ flexShrink: 0 }}
+                                  >
+                                    <Checkbox 
+                                      checked={selectedProducts.has(product.id)}
+                                      onChange={() => toggleProductSelection(product.id)}
+                                      label=""
+                                    />
+                                  </div>
+                                )}
                                 
                                 {/* Compact Product Image */}
                                 <div style={{
@@ -2723,8 +2477,108 @@ export default function Index() {
                             </div>
                           )}
                         </InlineStack>
-                        <Badge tone="warning">{lowStockProducts.length.toString()}</Badge>
+                        <InlineStack gap="200">
+                          <Badge tone="warning">{lowStockProducts.length.toString()}</Badge>
+                          {lowStockProducts.length > 0 && (
+                            <Button
+                              onClick={() => {
+                                setBulkEditMode({ ...bulkEditMode, lowStock: !bulkEditMode.lowStock });
+                                // Clear selections when toggling off
+                                if (bulkEditMode.lowStock) {
+                                  setSelectedProducts(new Set());
+                                }
+                              }}
+                              variant={bulkEditMode.lowStock ? "primary" : "secondary"}
+                              size="medium"
+                            >
+                              {bulkEditMode.lowStock ? 'Exit Bulk Edit' : 'Bulk Edit'}
+                            </Button>
+                          )}
+                        </InlineStack>
                       </InlineStack>
+
+                      {/* Bulk Edit Controls for Low Stock - Only show when enabled */}
+                      {bulkEditMode.lowStock && lowStockProducts.length > 0 && (
+                        <div style={{
+                          background: 'linear-gradient(135deg, #fffbeb 0%, #fcd34d 100%)',
+                          border: '2px solid #f59e0b',
+                          borderRadius: '12px',
+                          padding: '1.25rem',
+                          marginBottom: '1rem',
+                          boxShadow: '0 4px 6px rgba(245, 158, 11, 0.1)'
+                        }}>
+                          <BlockStack gap="300">
+                            <InlineStack align="space-between" blockAlign="center">
+                              <InlineStack gap="300" blockAlign="center">
+                                <div style={{
+                                  width: '32px',
+                                  height: '32px',
+                                  backgroundColor: '#f59e0b',
+                                  borderRadius: '8px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}>
+                                  <Icon source={CheckboxIcon} tone="base" />
+                                </div>
+                                <BlockStack gap="100">
+                                  <Text as="h4" variant="headingSm" fontWeight="semibold">
+                                    Bulk Actions - Low Stock Products
+                                  </Text>
+                                  <Text as="p" variant="bodySm" tone="subdued">
+                                    Select and manage multiple low stock products at once
+                                  </Text>
+                                </BlockStack>
+                              </InlineStack>
+                              <InlineStack gap="200">
+                                <Button
+                                  onClick={() => {
+                                    const allLowStockIds = lowStockProducts.map((p: Product) => p.id);
+                                    const newSelected = new Set(selectedProducts);
+                                    const selectedLowStock = allLowStockIds.filter((id: string) => newSelected.has(id));
+                                    
+                                    if (selectedLowStock.length === allLowStockIds.length) {
+                                      // Deselect all low stock
+                                      allLowStockIds.forEach((id: string) => newSelected.delete(id));
+                                    } else {
+                                      // Select all low stock
+                                      allLowStockIds.forEach((id: string) => newSelected.add(id));
+                                    }
+                                    setSelectedProducts(newSelected);
+                                  }}
+                                  variant="tertiary"
+                                  size="medium"
+                                >
+                                  {lowStockProducts.every((p: Product) => selectedProducts.has(p.id)) ? 'Deselect All' : 'Select All'}
+                                </Button>
+                                {Array.from(selectedProducts).filter((id: string) => lowStockProducts.some((p: Product) => p.id === id)).length > 0 && (
+                                  <Form method="post" style={{ display: 'inline' }}>
+                                    <input type="hidden" name="actionType" value="hideSelectedProducts" />
+                                    <input type="hidden" name="selectedProductIds" value={Array.from(selectedProducts).filter((id: string) => lowStockProducts.some((p: Product) => p.id === id)).join(',')} />
+                                    <Button
+                                      submit
+                                      variant="primary"
+                                      size="medium"
+                                    >
+                                      Hide {Array.from(selectedProducts).filter((id: string) => lowStockProducts.some((p: Product) => p.id === id)).length.toString()} Selected
+                                    </Button>
+                                  </Form>
+                                )}
+                              </InlineStack>
+                            </InlineStack>
+                            <div style={{
+                              padding: '0.75rem',
+                              background: 'rgba(255, 255, 255, 0.8)',
+                              borderRadius: '8px',
+                              border: '1px solid rgba(245, 158, 11, 0.2)'
+                            }}>
+                              <Text as="p" variant="bodySm" tone="subdued">
+                                💡 <strong>{Array.from(selectedProducts).filter((id: string) => lowStockProducts.some((p: Product) => p.id === id)).length}</strong> of <strong>{lowStockProducts.length}</strong> low stock products selected. Click products below to select/deselect them.
+                              </Text>
+                            </div>
+                          </BlockStack>
+                        </div>
+                      )}
                       
                       {lowStockProducts.length === 0 ? (
                         <EmptyState
@@ -2748,10 +2602,10 @@ export default function Index() {
                             style={{ 
                               maxHeight: '350px',
                               overflowY: 'auto',
-                              border: '1px solid #e2e8f0',
+                              border: '1px solid #fcd34d',
                               borderRadius: '8px',
                               padding: '1rem',
-                              background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+                              background: '#fffbeb',
                               transition: 'all 0.3s ease'
                             }}
                           >
@@ -2764,7 +2618,7 @@ export default function Index() {
                                 const isCritical = product.stock <= Math.floor(inventoryThreshold / 2);
                                 return (
                                   <div key={product.id} className="product-card-hover" style={{ 
-                                    background: '#ffffff',
+                                    background: '#fffcf5',
                                     border: isCritical ? '1px solid #f59e0b' : '1px solid #fcd34d',
                                     borderRadius: '8px',
                                     padding: '0.75rem',
@@ -2773,8 +2627,8 @@ export default function Index() {
                                   }}
                                   onClick={() => handleProductClick(product.id)}
                                   onMouseEnter={(e) => {
-                                    e.currentTarget.style.borderColor = isCritical ? '#d97706' : '#f59e0b';
-                                    e.currentTarget.style.boxShadow = `0 2px 8px rgba(${isCritical ? '217, 119, 6' : '245, 158, 11'}, 0.2)`;
+                                    e.currentTarget.style.borderColor = isCritical ? '#fb923c' : '#fbbf24';
+                                    e.currentTarget.style.boxShadow = `0 2px 8px rgba(${isCritical ? '251, 146, 60' : '251, 191, 36'}, 0.15)`;
                                     e.currentTarget.style.transform = 'translateY(-1px)';
                                   }}
                                   onMouseLeave={(e) => {
@@ -2783,17 +2637,19 @@ export default function Index() {
                                     e.currentTarget.style.transform = 'translateY(0)';
                                   }}>
                                     <InlineStack gap="300" blockAlign="center">
-                                      {/* Selection Checkbox */}
-                                      <div 
-                                        onClick={(e) => e.stopPropagation()}
-                                        style={{ flexShrink: 0 }}
-                                      >
-                                        <Checkbox 
-                                          checked={selectedProducts.has(product.id)}
-                                          onChange={() => toggleProductSelection(product.id)}
-                                          label=""
-                                        />
-                                      </div>
+                                      {/* Selection Checkbox - Only show in bulk edit mode */}
+                                      {bulkEditMode.lowStock && (
+                                        <div 
+                                          onClick={(e) => e.stopPropagation()}
+                                          style={{ flexShrink: 0 }}
+                                        >
+                                          <Checkbox 
+                                            checked={selectedProducts.has(product.id)}
+                                            onChange={() => toggleProductSelection(product.id)}
+                                            label=""
+                                          />
+                                        </div>
+                                      )}
                                       
                                       {/* Compact Product Image */}
                                       <div style={{
@@ -2954,24 +2810,6 @@ export default function Index() {
                           <Text as="p" variant="bodyMd" tone="subdued">
                             Priority-sorted predictions: Critical alerts first, then warnings
                           </Text>
-                          <div style={{
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            padding: '0.25rem 0.75rem',
-                            borderRadius: '12px',
-                            border: '1px solid rgba(16, 185, 129, 0.2)'
-                          }}>
-                            <InlineStack gap="100" blockAlign="center">
-                              <div style={{
-                                width: '6px',
-                                height: '6px',
-                                backgroundColor: '#10b981',
-                                borderRadius: '50%'
-                              }}></div>
-                              <Text as="span" variant="bodySm" tone="success" fontWeight="medium">
-                                Active - Using 30-day sales data
-                              </Text>
-                            </InlineStack>
-                          </div>
                         </InlineStack>
                       </BlockStack>
                     </InlineStack>
@@ -2993,128 +2831,138 @@ export default function Index() {
                     transition={{duration: '200ms', timingFunction: 'ease-in-out'}}
                   >
                     <BlockStack gap="400">
-                      {/* Controls and Status */}
-                      <InlineStack align="space-between" blockAlign="center">
-                        <InlineStack gap="300" blockAlign="center">
-                          <Select
-                            label="Time Period"
-                            labelHidden
-                            options={timePeriodOptions}
-                            value={timePeriod}
-                            onChange={setTimePeriod}
-                          />
-                          <Badge tone="success" size="small">Live Data</Badge>
-                        </InlineStack>
-                        
-                        <InlineStack gap="200">
-                          <Badge tone="critical">
-                            {`${lowStockProducts.filter((p: Product) => {
-                              const forecast = getForecastDays(p);
-                              return forecast <= 3;
-                            }).length} Critical`}
-                          </Badge>
-                          <Badge tone="warning">
-                            {`${lowStockProducts.filter((p: Product) => {
-                              const forecast = getForecastDays(p);
-                              return forecast > 3 && forecast <= 7;
-                            }).length} Warning`}
-                          </Badge>
-                          <Badge tone="success">
-                            {`${lowStockProducts.filter((p: Product) => {
-                              const forecast = getForecastDays(p);
-                              return forecast > 7;
-                            }).length} Safe`}
-                          </Badge>
-                        </InlineStack>
-                      </InlineStack>
-                      
-                      {/* Enhanced Forecast Status Legend */}
+                      {/* Enhanced Compact Forecast Status Legend with Controls */}
                       <div style={{ 
-                        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                        background: '#ffffff',
                         border: '1px solid #e2e8f0',
-                        borderRadius: '12px',
-                        padding: '1.5rem',
-                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
+                        borderRadius: '8px',
+                        padding: '1rem'
                       }}>
-                        <BlockStack gap="400">
-                          <Text as="h4" variant="headingMd" fontWeight="semibold">
-                            Forecast Status Guide
-                          </Text>
-                          
-                          <div style={{ 
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                            gap: '1rem'
-                          }}>
-                            {/* Critical Status */}
-                            <div style={{
-                              background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
-                              border: '1px solid #fca5a5',
-                              borderRadius: '8px',
-                              padding: '0.75rem',
-                              textAlign: 'center'
-                            }}>
-                              <BlockStack gap="200">
-                                <Badge tone="critical" size="medium">Critical</Badge>
-                                <Text as="p" variant="bodySm" tone="subdued">
-                                  ≤ 3 days until stockout
-                                </Text>
-                                <Text as="p" variant="bodySm" tone="subdued">
-                                  Immediate action required
-                                </Text>
-                              </BlockStack>
-                            </div>
-
-                            {/* Warning Status */}
-                            <div style={{
-                              background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
-                              border: '1px solid #fcd34d',
-                              borderRadius: '8px',
-                              padding: '0.75rem',
-                              textAlign: 'center'
-                            }}>
-                              <BlockStack gap="200">
-                                <Badge tone="warning" size="medium">Warning</Badge>
-                                <Text as="p" variant="bodySm" tone="subdued">
-                                  4-7 days until stockout
-                                </Text>
-                                <Text as="p" variant="bodySm" tone="subdued">
-                                  Consider reordering soon
-                                </Text>
-                              </BlockStack>
-                            </div>
-
-                            {/* Safe Status */}
-                            <div style={{
-                              background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-                              border: '1px solid #86efac',
-                              borderRadius: '8px',
-                              padding: '0.75rem',
-                              textAlign: 'center'
-                            }}>
-                              <BlockStack gap="200">
-                                <Badge tone="success" size="medium">Safe</Badge>
-                                <Text as="p" variant="bodySm" tone="subdued">
-                                  8+ days of stock
-                                </Text>
-                                <Text as="p" variant="bodySm" tone="subdued">
-                                  Inventory levels healthy
-                                </Text>
-                              </BlockStack>
-                            </div>
-                          </div>
-
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          flexWrap: 'wrap',
+                          gap: '1rem'
+                        }}>
+                          {/* Status Indicators - Horizontal Layout */}
                           <div style={{
-                            background: 'rgba(59, 130, 246, 0.05)',
-                            border: '1px solid rgba(59, 130, 246, 0.1)',
-                            borderRadius: '6px',
-                            padding: '0.75rem'
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '1.5rem',
+                            flexWrap: 'wrap'
                           }}>
-                            <Text as="p" variant="bodySm" tone="subdued">
-                              Forecast based on {timePeriod === 'daily' ? 'daily' : timePeriod === 'weekly' ? 'weekly' : 'monthly'} sales velocity from the last 30 days
-                            </Text>
+                            {/* Critical */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              padding: '0.4rem 0.75rem',
+                              background: '#fef2f2',
+                              border: '1px solid #fecaca',
+                              borderRadius: '20px'
+                            }}>
+                              <div style={{
+                                width: '8px',
+                                height: '8px',
+                                backgroundColor: '#dc2626',
+                                borderRadius: '50%'
+                              }}></div>
+                              <Text as="span" variant="bodySm" fontWeight="medium">
+                                0 Critical - Restock Urgent
+                              </Text>
+                            </div>
+
+                            {/* Warning */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              padding: '0.4rem 0.75rem',
+                              background: '#fffbeb',
+                              border: '1px solid #fcd34d',
+                              borderRadius: '20px'
+                            }}>
+                              <div style={{
+                                width: '8px',
+                                height: '8px',
+                                backgroundColor: '#f59e0b',
+                                borderRadius: '50%'
+                              }}></div>
+                              <Text as="span" variant="bodySm" fontWeight="medium">
+                                0 Warning - Order Soon
+                              </Text>
+                            </div>
+
+                            {/* Safe */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              padding: '0.4rem 0.75rem',
+                              background: '#f0fdf4',
+                              border: '1px solid #86efac',
+                              borderRadius: '20px'
+                            }}>
+                              <div style={{
+                                width: '8px',
+                                height: '8px',
+                                backgroundColor: '#10b981',
+                                borderRadius: '50%'
+                              }}></div>
+                              <Text as="span" variant="bodySm" fontWeight="medium">
+                                6 Safe - Well Stocked
+                              </Text>
+                            </div>
                           </div>
-                        </BlockStack>
+
+                          {/* Time Period Selector - Matching Status Indicators Design */}
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
+                          }}>
+                            {timePeriodOptions.map((option, index) => (
+                              <div
+                                key={option.value}
+                                onClick={() => setTimePeriod(option.value)}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.5rem',
+                                  padding: '0.4rem 0.75rem',
+                                  background: timePeriod === option.value ? '#eff6ff' : '#f8fafc',
+                                  border: `1px solid ${timePeriod === option.value ? '#93c5fd' : '#e2e8f0'}`,
+                                  borderRadius: '20px',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.15s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (timePeriod !== option.value) {
+                                    e.currentTarget.style.background = '#f1f5f9';
+                                    e.currentTarget.style.borderColor = '#cbd5e1';
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (timePeriod !== option.value) {
+                                    e.currentTarget.style.background = '#f8fafc';
+                                    e.currentTarget.style.borderColor = '#e2e8f0';
+                                  }
+                                }}
+                              >
+                                <div style={{
+                                  width: '8px',
+                                  height: '8px',
+                                  backgroundColor: timePeriod === option.value ? '#3b82f6' : '#94a3b8',
+                                  borderRadius: '50%'
+                                }}></div>
+                                <Text as="span" variant="bodySm" fontWeight="medium">
+                                  {option.label}
+                                </Text>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                       
                       {/* Products Detailed List */}
@@ -3704,8 +3552,11 @@ export default function Index() {
       {/* Notification Settings Modal */}
       <Modal
         open={showNotificationSettings}
-        onClose={() => setShowNotificationSettings(false)}
-        title="Notification Settings"
+        onClose={() => {
+          setShowNotificationSettings(false);
+          setActiveNotificationModal(null);
+        }}
+        title={`${activeNotificationModal ? (activeNotificationModal.charAt(0).toUpperCase() + activeNotificationModal.slice(1)) + ' ' : ''}Notification Settings`}
         primaryAction={{
           content: 'Save Settings',
           onAction: saveNotificationSettings,
@@ -3716,166 +3567,178 @@ export default function Index() {
             onAction: () => {
               setLocalNotificationSettings(notificationSettings);
               setShowNotificationSettings(false);
+              setActiveNotificationModal(null);
             },
           },
         ]}
       >
         <Modal.Section>
           <FormLayout>
-            {/* Email Settings */}
-            <Card>
-              <BlockStack gap="300">
-                <Text as="h4" variant="headingSm" fontWeight="bold">
-                  Email Notifications
-                </Text>
-                <Checkbox
-                  label="Enable email notifications"
-                  checked={localNotificationSettings.email.enabled}
-                  onChange={(checked) => handleNotificationSettingChange('email', 'enabled', checked)}
-                  helpText="Receive email alerts for low stock products"
-                />
+            {/* Email Settings - Show only if activeNotificationModal is 'email' or null */}
+            {(!activeNotificationModal || activeNotificationModal === 'email') && (
+              <Card>
+                <BlockStack gap="300">
+                  <Text as="h4" variant="headingSm" fontWeight="bold">
+                    Email Notifications
+                  </Text>
+                  <Checkbox
+                    label="Enable email notifications"
+                    checked={localNotificationSettings.email.enabled}
+                    onChange={(checked) => handleNotificationSettingChange('email', 'enabled', checked)}
+                    helpText="Receive email alerts for low stock products"
+                  />
 
-                {localNotificationSettings.email.enabled && (
-                  <>
-                    <div style={{ padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '4px', marginBottom: '1rem' }}>
-                      <Text as="p" variant="bodyMd">
-                        <strong>From:</strong> {shopInfo.name} &lt;{shopInfo.email}&gt;
-                      </Text>
-                      <Text as="p" variant="bodyMd" tone="subdued">
-                        Emails will be sent automatically using your shop's information
-                      </Text>
-                    </div>
+                  {localNotificationSettings.email.enabled && (
+                    <>
+                      <div style={{ padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '4px', marginBottom: '1rem' }}>
+                        <Text as="p" variant="bodyMd">
+                          <strong>From:</strong> {shopInfo.name} &lt;{shopInfo.email}&gt;
+                        </Text>
+                        <Text as="p" variant="bodyMd" tone="subdued">
+                          Emails will be sent automatically using your shop's information
+                        </Text>
+                      </div>
 
-                    <TextField
-                      label="Recipient Email Address"
-                      value={localNotificationSettings.email.recipientEmail}
-                      onChange={(value) => handleNotificationSettingChange('email', 'recipientEmail', value)}
-                      placeholder="alerts@yourcompany.com"
-                      helpText="Email address where stock alerts will be sent"
-                      autoComplete="email"
-                    />
-
-                    <BlockStack gap="200">
-                      <Text as="h5" variant="headingXs" fontWeight="semibold">
-                        Alert Types
-                      </Text>
-                      <Checkbox
-                        label="Out of Stock Alerts"
-                        checked={localNotificationSettings.email.oosAlertsEnabled || false}
-                        onChange={(checked) => handleNotificationSettingChange('email', 'oosAlertsEnabled', checked)}
-                        helpText="Send emails when products are completely out of stock"
+                      <TextField
+                        label="Recipient Email Address"
+                        value={localNotificationSettings.email.recipientEmail}
+                        onChange={(value) => handleNotificationSettingChange('email', 'recipientEmail', value)}
+                        placeholder="alerts@yourcompany.com"
+                        helpText="Email address where stock alerts will be sent"
+                        autoComplete="email"
                       />
-                      <Checkbox
-                        label="Critical Level Alerts"
-                        checked={localNotificationSettings.email.criticalAlertsEnabled || false}
-                        onChange={(checked) => handleNotificationSettingChange('email', 'criticalAlertsEnabled', checked)}
-                        helpText="Send emails when products reach critically low levels"
+
+                      <BlockStack gap="200">
+                        <Text as="h5" variant="headingXs" fontWeight="semibold">
+                          Alert Types
+                        </Text>
+                        <Checkbox
+                          label="Out of Stock Alerts"
+                          checked={localNotificationSettings.email.oosAlertsEnabled || false}
+                          onChange={(checked) => handleNotificationSettingChange('email', 'oosAlertsEnabled', checked)}
+                          helpText="Send emails when products are completely out of stock"
+                        />
+                        <Checkbox
+                          label="Critical Level Alerts"
+                          checked={localNotificationSettings.email.criticalAlertsEnabled || false}
+                          onChange={(checked) => handleNotificationSettingChange('email', 'criticalAlertsEnabled', checked)}
+                          helpText="Send emails when products reach critically low levels"
+                        />
+                      </BlockStack>
+                    </>
+                  )}
+                </BlockStack>
+              </Card>
+            )}
+
+            {/* Slack Settings - Show only if activeNotificationModal is 'slack' or null */}
+            {(!activeNotificationModal || activeNotificationModal === 'slack') && (
+              <Card>
+                <BlockStack gap="300">
+                  <Text as="h4" variant="headingSm" fontWeight="bold">
+                    Slack Notifications
+                  </Text>
+                  <Checkbox
+                    label="Enable Slack notifications"
+                    checked={localNotificationSettings.slack.enabled}
+                    onChange={(checked) => handleNotificationSettingChange('slack', 'enabled', checked)}
+                    helpText="Send alerts to your Slack workspace"
+                  />
+
+                  {localNotificationSettings.slack.enabled && (
+                    <>
+                      <TextField
+                        label="Slack Webhook URL"
+                        value={localNotificationSettings.slack.webhookUrl}
+                        onChange={(value) => handleNotificationSettingChange('slack', 'webhookUrl', value)}
+                        placeholder="https://hooks.slack.com/services/..."
+                        helpText="Get this from Slack's incoming webhooks app"
+                        autoComplete="off"
                       />
-                    </BlockStack>
-                  </>
-                )}
-              </BlockStack>
-            </Card>
+                      
+                      <TextField
+                        label="Channel"
+                        value={localNotificationSettings.slack.channel}
+                        onChange={(value) => handleNotificationSettingChange('slack', 'channel', value)}
+                        placeholder="#inventory"
+                        helpText="Channel where alerts will be posted"
+                        autoComplete="off"
+                      />
+                    </>
+                  )}
+                </BlockStack>
+              </Card>
+            )}
 
-            {/* Slack Settings */}
-            <Card>
-              <BlockStack gap="300">
-                <Text as="h4" variant="headingSm" fontWeight="bold">
-                  Slack Notifications
-                </Text>
-                <Checkbox
-                  label="Enable Slack notifications"
-                  checked={localNotificationSettings.slack.enabled}
-                  onChange={(checked) => handleNotificationSettingChange('slack', 'enabled', checked)}
-                  helpText="Send alerts to your Slack workspace"
-                />
+            {/* Discord Settings - Show only if activeNotificationModal is 'discord' or null */}
+            {(!activeNotificationModal || activeNotificationModal === 'discord') && (
+              <Card>
+                <BlockStack gap="300">
+                  <Text as="h4" variant="headingSm" fontWeight="bold">
+                    Discord Notifications
+                  </Text>
+                  <Checkbox
+                    label="Enable Discord notifications"
+                    checked={localNotificationSettings.discord.enabled}
+                    onChange={(checked) => handleNotificationSettingChange('discord', 'enabled', checked)}
+                    helpText="Send alerts to your Discord server"
+                  />
 
-                {localNotificationSettings.slack.enabled && (
-                  <>
-                    <TextField
-                      label="Slack Webhook URL"
-                      value={localNotificationSettings.slack.webhookUrl}
-                      onChange={(value) => handleNotificationSettingChange('slack', 'webhookUrl', value)}
-                      placeholder="https://hooks.slack.com/services/..."
-                      helpText="Get this from Slack's incoming webhooks app"
-                      autoComplete="off"
-                    />
-                    
-                    <TextField
-                      label="Channel"
-                      value={localNotificationSettings.slack.channel}
-                      onChange={(value) => handleNotificationSettingChange('slack', 'channel', value)}
-                      placeholder="#inventory"
-                      helpText="Channel where alerts will be posted"
-                      autoComplete="off"
-                    />
-                  </>
-                )}
-              </BlockStack>
-            </Card>
-
-            {/* Discord Settings */}
-            <Card>
-              <BlockStack gap="300">
-                <Text as="h4" variant="headingSm" fontWeight="bold">
-                  Discord Notifications
-                </Text>
-                <Checkbox
-                  label="Enable Discord notifications"
-                  checked={localNotificationSettings.discord.enabled}
-                  onChange={(checked) => handleNotificationSettingChange('discord', 'enabled', checked)}
-                  helpText="Send alerts to your Discord server"
-                />
-
-                {localNotificationSettings.discord.enabled && (
-                  <>
-                    <TextField
-                      label="Discord Webhook URL"
-                      value={localNotificationSettings.discord.webhookUrl}
-                      onChange={(value) => handleNotificationSettingChange('discord', 'webhookUrl', value)}
-                      placeholder="https://discord.com/api/webhooks/..."
-                      helpText="Get this from Discord server settings > Integrations > Webhooks"
-                      autoComplete="off"
-                    />
-                    
-                    <TextField
-                      label="Bot Username"
-                      value={localNotificationSettings.discord.username}
-                      onChange={(value) => handleNotificationSettingChange('discord', 'username', value)}
-                      placeholder="Inventory Bot"
-                      helpText="Display name for the bot in Discord"
-                      autoComplete="off"
-                    />
-                  </>
-                )}
-              </BlockStack>
-            </Card>
+                  {localNotificationSettings.discord.enabled && (
+                    <>
+                      <TextField
+                        label="Discord Webhook URL"
+                        value={localNotificationSettings.discord.webhookUrl}
+                        onChange={(value) => handleNotificationSettingChange('discord', 'webhookUrl', value)}
+                        placeholder="https://discord.com/api/webhooks/..."
+                        helpText="Get this from Discord server settings > Integrations > Webhooks"
+                        autoComplete="off"
+                      />
+                      
+                      <TextField
+                        label="Bot Username"
+                        value={localNotificationSettings.discord.username}
+                        onChange={(value) => handleNotificationSettingChange('discord', 'username', value)}
+                        placeholder="Inventory Bot"
+                        helpText="Display name for the bot in Discord"
+                        autoComplete="off"
+                      />
+                    </>
+                  )}
+                </BlockStack>
+              </Card>
+            )}
           </FormLayout>
           
-          {/* Test Notifications */}
-          {(localNotificationSettings.email.enabled && localNotificationSettings.email.recipientEmail) ||
+          {/* Test Notifications - Only show if at least one channel is properly configured */}
+          {((localNotificationSettings.email.enabled && localNotificationSettings.email.recipientEmail) ||
            (localNotificationSettings.slack.enabled && localNotificationSettings.slack.webhookUrl) ||
-           (localNotificationSettings.discord.enabled && localNotificationSettings.discord.webhookUrl) ? (
+           (localNotificationSettings.discord.enabled && localNotificationSettings.discord.webhookUrl)) && (
             <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-              <Text as="p" variant="bodyMd" tone="subdued">
-                Test your notification configuration:
-              </Text>
-              <Form method="post" style={{ marginTop: '0.5rem' }}>
-                <input type="hidden" name="actionType" value="testNotifications" />
-                <input type="hidden" name="emailEnabled" value={localNotificationSettings.email.enabled.toString()} />
-                <input type="hidden" name="recipientEmail" value={localNotificationSettings.email.recipientEmail} />
-                <input type="hidden" name="slackEnabled" value={localNotificationSettings.slack.enabled.toString()} />
-                <input type="hidden" name="slackWebhook" value={localNotificationSettings.slack.webhookUrl} />
-                <input type="hidden" name="slackChannel" value={localNotificationSettings.slack.channel} />
-                <input type="hidden" name="discordEnabled" value={localNotificationSettings.discord.enabled.toString()} />
-                <input type="hidden" name="discordWebhook" value={localNotificationSettings.discord.webhookUrl} />
-                <input type="hidden" name="discordUsername" value={localNotificationSettings.discord.username} />
-                <Button submit size="slim">
-                  Send Test Notifications
-                </Button>
-              </Form>
+              <BlockStack gap="200">
+                <Text as="h5" variant="bodySm" fontWeight="semibold">
+                  Test Your Notifications
+                </Text>
+                <Text as="p" variant="bodySm" tone="subdued">
+                  Make sure to save your settings first, then test to verify everything is working correctly.
+                </Text>
+                <Form method="post" style={{ marginTop: '0.5rem' }}>
+                  <input type="hidden" name="actionType" value="testNotifications" />
+                  <input type="hidden" name="emailEnabled" value={localNotificationSettings.email.enabled.toString()} />
+                  <input type="hidden" name="recipientEmail" value={localNotificationSettings.email.recipientEmail} />
+                  <input type="hidden" name="slackEnabled" value={localNotificationSettings.slack.enabled.toString()} />
+                  <input type="hidden" name="slackWebhook" value={localNotificationSettings.slack.webhookUrl} />
+                  <input type="hidden" name="slackChannel" value={localNotificationSettings.slack.channel} />
+                  <input type="hidden" name="discordEnabled" value={localNotificationSettings.discord.enabled.toString()} />
+                  <input type="hidden" name="discordWebhook" value={localNotificationSettings.discord.webhookUrl} />
+                  <input type="hidden" name="discordUsername" value={localNotificationSettings.discord.username} />
+                  <Button submit size="slim">
+                    Send Test Notifications
+                  </Button>
+                </Form>
+              </BlockStack>
             </div>
-          ) : null}
+          )}
         </Modal.Section>
       </Modal>
 
@@ -4222,7 +4085,7 @@ export default function Index() {
                     Product Details: {selectedProduct.createdAt ? getDaysInStore(selectedProduct.createdAt) : 0} days in store • 
                     {selectedProduct.lastSoldDate ? getDaysSinceLastSale(selectedProduct.lastSoldDate) : 0} days since last sale • 
                     Current price: ${Number(selectedProduct.price || 0).toFixed(2)} • 
-                    Category: {selectedProduct.category || 'Unknown'}
+                    Category: {selectedProduct.category || 'Not Specified'}
                   </Text>
                 </InlineStack>
               </div>
