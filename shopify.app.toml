@@ -3,7 +3,7 @@
 client_id = "eb3e85d01989aa2d6f08378b8df5a312"
 name = "spector"
 handle = "spector-1"
-application_url = "https://marijuana-olympics-kevin-needed.trycloudflare.com"
+application_url = "https://saskatchewan-knock-breaks-entire.trycloudflare.com"
 embedded = true
 
 [build]
@@ -26,7 +26,7 @@ api_version = "2025-07"
 scopes = "write_products,read_orders"
 
 [auth]
-redirect_urls = ["https://marijuana-olympics-kevin-needed.trycloudflare.com/auth/callback", "https://marijuana-olympics-kevin-needed.trycloudflare.com/auth/shopify/callback", "https://marijuana-olympics-kevin-needed.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://saskatchewan-knock-breaks-entire.trycloudflare.com/auth/callback", "https://saskatchewan-knock-breaks-entire.trycloudflare.com/auth/shopify/callback", "https://saskatchewan-knock-breaks-entire.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false

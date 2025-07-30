@@ -38,7 +38,6 @@ import {
   ViewIcon,
   HideIcon,
   RefreshIcon,
-  SettingsIcon,
 } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
@@ -1499,22 +1498,6 @@ export default function Index() {
             position: relative !important;
           }
 
-          /* Pulse Animation for Configuration Needed */
-          @keyframes pulse {
-            0% {
-              transform: scale(1);
-              box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
-            }
-            50% {
-              transform: scale(1.05);
-              box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
-            }
-            100% {
-              transform: scale(1);
-              box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
-            }
-          }
-
           .product-drafted::after {
             content: '📝 DRAFTED' !important;
             position: absolute !important;
@@ -2253,360 +2236,271 @@ export default function Index() {
             </div>
           </div>
           
-          {/* Notification Settings - Simple List */}
+          {/* Notification Settings - Compact */}
           <div style={{
             marginTop: '1.5rem',
-            padding: '1.5rem',
+            padding: '1rem',
             background: '#ffffff',
             borderRadius: '8px',
             border: '1px solid #e2e8f0',
             boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
           }}>
-            <div style={{ marginBottom: '1rem' }}>
-              <Text as="h4" variant="headingSm" fontWeight="semibold">
-                Notifications
-              </Text>
-              <div style={{ marginTop: '0.25rem' }}>
-                <Text as="p" variant="bodySm" tone="subdued">
-                  Configure alerts for stock changes
-                </Text>
-              </div>
-            </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {/* Email Row */}
+            <BlockStack gap="300">
+              <InlineStack align="space-between" blockAlign="center">
+                <BlockStack gap="100">
+                  <Text as="h4" variant="headingSm" fontWeight="semibold">
+                    Notifications
+                  </Text>
+                  <Text as="p" variant="bodySm" tone="subdued">
+                    Configure alerts for stock changes
+                  </Text>
+                </BlockStack>
+              </InlineStack>
+              
+              {/* Clean Notification Controls */}
               <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '12px',
-                background: localNotificationSettings.email.enabled ? 
-                  (localNotificationSettings.email.recipientEmail ? '#f0fdf4' : '#fef3f2') : '#f8fafc',
-                borderRadius: '6px',
-                border: localNotificationSettings.email.enabled ? 
-                  (localNotificationSettings.email.recipientEmail ? '1px solid #86efac' : '1px solid #fecaca') : '1px solid #e2e8f0'
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '1rem'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ position: 'relative' }}>
-                    <span style={{ fontSize: '16px' }}>📧</span>
-                    {localNotificationSettings.email.enabled && !localNotificationSettings.email.recipientEmail && (
-                      <div style={{
-                        position: 'absolute',
-                        top: '-2px',
-                        right: '-2px',
-                        width: '8px',
-                        height: '8px',
-                        background: '#ef4444',
-                        borderRadius: '50%',
-                        animation: 'pulse 2s infinite'
-                      }} />
-                    )}
-                    {localNotificationSettings.email.enabled && localNotificationSettings.email.recipientEmail && (
-                      <div style={{
-                        position: 'absolute',
-                        top: '-2px',
-                        right: '-2px',
-                        width: '8px',
-                        height: '8px',
-                        background: '#10b981',
-                        borderRadius: '50%'
-                      }} />
-                    )}
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: '500', fontSize: '14px' }}>Email Alerts</div>
-                    <div style={{ 
-                      fontSize: '12px', 
-                      color: localNotificationSettings.email.enabled && !localNotificationSettings.email.recipientEmail ? '#dc2626' : '#6b7280',
-                      marginTop: '2px' 
-                    }}>
-                      {localNotificationSettings.email.enabled && localNotificationSettings.email.recipientEmail
-                        ? `✓ Configured: ${localNotificationSettings.email.recipientEmail}`
-                        : localNotificationSettings.email.enabled 
-                        ? '⚠️ Configuration needed'
-                        : 'Configure email notifications'
-                      }
+                {/* Email - Clean Card */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '1rem',
+                  background: '#f8fafc',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onClick={() => {
+                  setActiveNotificationModal('email');
+                  setShowNotificationSettings(true);
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f1f5f9';
+                  e.currentTarget.style.borderColor = '#cbd5e1';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8fafc';
+                  e.currentTarget.style.borderColor = '#e2e8f0';
+                }}
+                >
+                  <div style={{ fontSize: '24px' }}>📧</div>
+                  
+                  {/* Horizontal layout for text and toggle */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    gap: '0.5rem'
+                  }}>
+                    <Text as="p" variant="bodySm" fontWeight="medium">
+                      Email
+                    </Text>
+                    
+                    {/* Toggle Switch */}
+                    <div
+                      style={{
+                        width: '32px',
+                        height: '18px',
+                        backgroundColor: localNotificationSettings.email.enabled ? '#059669' : '#d1d5db',
+                        borderRadius: '9px',
+                        position: 'relative',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNotificationSettingChange('email', 'enabled', !localNotificationSettings.email.enabled);
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '14px',
+                          height: '14px',
+                          backgroundColor: 'white',
+                          borderRadius: '50%',
+                          position: 'absolute',
+                          top: '2px',
+                          left: localNotificationSettings.email.enabled ? '16px' : '2px',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
+                        }}
+                      />
                     </div>
                   </div>
-                </div>
-                
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Button
-                    onClick={() => {
-                      setActiveNotificationModal('email');
-                      setShowNotificationSettings(true);
-                    }}
-                    variant="tertiary"
-                    size="medium"
-                    icon={SettingsIcon}
-                    data-config="email"
-                  >
-                    Configure
-                  </Button>
                   
+                  {/* Status indicator */}
+                  {localNotificationSettings.email.enabled && localNotificationSettings.email.recipientEmail && (
+                    <div style={{
+                      width: '8px',
+                      height: '8px',
+                      backgroundColor: '#10b981',
+                      borderRadius: '50%'
+                    }} />
+                  )}
+                </div>
+
+                {/* Slack Button with Toggle */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '1rem',
+                  background: '#f8fafc',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onClick={() => {
+                  setActiveNotificationModal('slack');
+                  setShowNotificationSettings(true);
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f1f5f9';
+                  e.currentTarget.style.borderColor = '#cbd5e1';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8fafc';
+                  e.currentTarget.style.borderColor = '#e2e8f0';
+                }}
+                >
+                  {/* Slack Toggle Switch */}
                   <div
                     style={{
-                      width: '36px',
-                      height: '20px',
-                      backgroundColor: localNotificationSettings.email.enabled ? '#059669' : '#d1d5db',
-                      borderRadius: '10px',
+                      width: '32px',
+                      height: '18px',
+                      backgroundColor: localNotificationSettings.slack.enabled ? '#059669' : '#d1d5db',
+                      borderRadius: '9px',
                       position: 'relative',
                       cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      boxShadow: localNotificationSettings.email.enabled ? '0 0 0 3px rgba(5, 150, 105, 0.2)' : 'none'
+                      transition: 'all 0.3s ease'
                     }}
-                    onClick={() => {
-                      handleNotificationSettingChange('email', 'enabled', !localNotificationSettings.email.enabled);
-                      // Show pulse animation to indicate configuration needed
-                      if (!localNotificationSettings.email.enabled) {
-                        setTimeout(() => {
-                          const configBtn = document.querySelector('[data-config="email"]') as HTMLElement;
-                          if (configBtn) {
-                            configBtn.style.animation = 'pulse 0.6s ease-in-out 3';
-                          }
-                        }, 300);
-                      }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNotificationSettingChange('slack', 'enabled', !localNotificationSettings.slack.enabled);
                     }}
                   >
                     <div
                       style={{
-                        width: '16px',
-                        height: '16px',
+                        width: '14px',
+                        height: '14px',
                         backgroundColor: 'white',
                         borderRadius: '50%',
                         position: 'absolute',
                         top: '2px',
-                        left: localNotificationSettings.email.enabled ? '18px' : '2px',
-                        transition: 'left 0.2s',
+                        left: localNotificationSettings.slack.enabled ? '16px' : '2px',
+                        transition: 'all 0.3s ease',
                         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
                       }}
                     />
                   </div>
-                </div>
-              </div>
-
-              {/* Slack Row */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '12px',
-                background: localNotificationSettings.slack.enabled ? 
-                  (localNotificationSettings.slack.webhookUrl ? '#f0fdf4' : '#fef3f2') : '#f8fafc',
-                borderRadius: '6px',
-                border: localNotificationSettings.slack.enabled ? 
-                  (localNotificationSettings.slack.webhookUrl ? '1px solid #86efac' : '1px solid #fecaca') : '1px solid #e2e8f0'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ position: 'relative' }}>
-                    <span style={{ fontSize: '16px' }}>📱</span>
-                    {localNotificationSettings.slack.enabled && !localNotificationSettings.slack.webhookUrl && (
-                      <div style={{
-                        position: 'absolute',
-                        top: '-2px',
-                        right: '-2px',
-                        width: '8px',
-                        height: '8px',
-                        background: '#ef4444',
-                        borderRadius: '50%',
-                        animation: 'pulse 2s infinite'
-                      }} />
-                    )}
-                    {localNotificationSettings.slack.enabled && localNotificationSettings.slack.webhookUrl && (
-                      <div style={{
-                        position: 'absolute',
-                        top: '-2px',
-                        right: '-2px',
-                        width: '8px',
-                        height: '8px',
-                        background: '#10b981',
-                        borderRadius: '50%'
-                      }} />
-                    )}
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: '500', fontSize: '14px' }}>Slack Alerts</div>
-                    <div style={{ 
-                      fontSize: '12px', 
-                      color: localNotificationSettings.slack.enabled && !localNotificationSettings.slack.webhookUrl ? '#dc2626' : '#6b7280',
-                      marginTop: '2px' 
-                    }}>
-                      {localNotificationSettings.slack.enabled && localNotificationSettings.slack.webhookUrl
-                        ? '✓ Connected to Slack workspace'
-                        : localNotificationSettings.slack.enabled 
-                        ? '⚠️ Configuration needed'
-                        : 'Configure Slack webhook'
-                      }
-                    </div>
-                  </div>
-                </div>
-                
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  
+                  {/* Slack Setup Button */}
                   <Button
+                    variant={localNotificationSettings.slack.enabled ? "primary" : "secondary"}
+                    size="slim"
                     onClick={() => {
                       setActiveNotificationModal('slack');
                       setShowNotificationSettings(true);
                     }}
-                    variant="tertiary"
-                    size="medium"
-                    icon={SettingsIcon}
-                    data-config="slack"
                   >
-                    Configure
+                    � Slack
+                    {localNotificationSettings.slack.enabled && localNotificationSettings.slack.webhookUrl ? ' ✓' : ''}
                   </Button>
+                </div>
+
+                {/* Discord - Clean Card */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '1rem',
+                  background: '#f8fafc',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onClick={() => {
+                  setActiveNotificationModal('discord');
+                  setShowNotificationSettings(true);
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f1f5f9';
+                  e.currentTarget.style.borderColor = '#cbd5e1';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8fafc';
+                  e.currentTarget.style.borderColor = '#e2e8f0';
+                }}
+                >
+                  <div style={{ fontSize: '24px' }}>🎮</div>
                   
-                  <div
-                    style={{
-                      width: '36px',
-                      height: '20px',
-                      backgroundColor: localNotificationSettings.slack.enabled ? '#059669' : '#d1d5db',
-                      borderRadius: '10px',
-                      position: 'relative',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      boxShadow: localNotificationSettings.slack.enabled ? '0 0 0 3px rgba(5, 150, 105, 0.2)' : 'none'
-                    }}
-                    onClick={() => {
-                      handleNotificationSettingChange('slack', 'enabled', !localNotificationSettings.slack.enabled);
-                      // Show pulse animation to indicate configuration needed
-                      if (!localNotificationSettings.slack.enabled) {
-                        setTimeout(() => {
-                          const configBtn = document.querySelector('[data-config="slack"]') as HTMLElement;
-                          if (configBtn) {
-                            configBtn.style.animation = 'pulse 0.6s ease-in-out 3';
-                          }
-                        }, 300);
-                      }
-                    }}
-                  >
+                  {/* Horizontal layout for text and toggle */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    gap: '0.5rem'
+                  }}>
+                    <Text as="p" variant="bodySm" fontWeight="medium">
+                      Discord
+                    </Text>
+                    
+                    {/* Toggle Switch */}
                     <div
                       style={{
-                        width: '16px',
-                        height: '16px',
-                        backgroundColor: 'white',
-                        borderRadius: '50%',
-                        position: 'absolute',
-                        top: '2px',
-                        left: localNotificationSettings.slack.enabled ? '18px' : '2px',
-                        transition: 'left 0.2s',
-                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
+                        width: '32px',
+                        height: '18px',
+                        backgroundColor: localNotificationSettings.discord.enabled ? '#059669' : '#d1d5db',
+                        borderRadius: '9px',
+                        position: 'relative',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease'
                       }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Discord Row */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '12px',
-                background: localNotificationSettings.discord.enabled ? 
-                  (localNotificationSettings.discord.webhookUrl ? '#f0fdf4' : '#fef3f2') : '#f8fafc',
-                borderRadius: '6px',
-                border: localNotificationSettings.discord.enabled ? 
-                  (localNotificationSettings.discord.webhookUrl ? '1px solid #86efac' : '1px solid #fecaca') : '1px solid #e2e8f0'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ position: 'relative' }}>
-                    <span style={{ fontSize: '16px' }}>🎮</span>
-                    {localNotificationSettings.discord.enabled && !localNotificationSettings.discord.webhookUrl && (
-                      <div style={{
-                        position: 'absolute',
-                        top: '-2px',
-                        right: '-2px',
-                        width: '8px',
-                        height: '8px',
-                        background: '#ef4444',
-                        borderRadius: '50%',
-                        animation: 'pulse 2s infinite'
-                      }} />
-                    )}
-                    {localNotificationSettings.discord.enabled && localNotificationSettings.discord.webhookUrl && (
-                      <div style={{
-                        position: 'absolute',
-                        top: '-2px',
-                        right: '-2px',
-                        width: '8px',
-                        height: '8px',
-                        background: '#10b981',
-                        borderRadius: '50%'
-                      }} />
-                    )}
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: '500', fontSize: '14px' }}>Discord Alerts</div>
-                    <div style={{ 
-                      fontSize: '12px', 
-                      color: localNotificationSettings.discord.enabled && !localNotificationSettings.discord.webhookUrl ? '#dc2626' : '#6b7280',
-                      marginTop: '2px' 
-                    }}>
-                      {localNotificationSettings.discord.enabled && localNotificationSettings.discord.webhookUrl
-                        ? '✓ Connected to Discord server'
-                        : localNotificationSettings.discord.enabled 
-                        ? '⚠️ Configuration needed'
-                        : 'Configure Discord webhook'
-                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNotificationSettingChange('discord', 'enabled', !localNotificationSettings.discord.enabled);
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '14px',
+                          height: '14px',
+                          backgroundColor: 'white',
+                          borderRadius: '50%',
+                          position: 'absolute',
+                          top: '2px',
+                          left: localNotificationSettings.discord.enabled ? '16px' : '2px',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
+                        }}
+                      />
                     </div>
                   </div>
-                </div>
-                
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Button
-                    onClick={() => {
-                      setActiveNotificationModal('discord');
-                      setShowNotificationSettings(true);
-                    }}
-                    variant="tertiary"
-                    size="medium"
-                    icon={SettingsIcon}
-                    data-config="discord"
-                  >
-                    Configure
-                  </Button>
                   
-                  <div
-                    style={{
-                      width: '36px',
-                      height: '20px',
-                      backgroundColor: localNotificationSettings.discord.enabled ? '#059669' : '#d1d5db',
-                      borderRadius: '10px',
-                      position: 'relative',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      boxShadow: localNotificationSettings.discord.enabled ? '0 0 0 3px rgba(5, 150, 105, 0.2)' : 'none'
-                    }}
-                    onClick={() => {
-                      handleNotificationSettingChange('discord', 'enabled', !localNotificationSettings.discord.enabled);
-                      // Show pulse animation to indicate configuration needed
-                      if (!localNotificationSettings.discord.enabled) {
-                        setTimeout(() => {
-                          const configBtn = document.querySelector('[data-config="discord"]') as HTMLElement;
-                          if (configBtn) {
-                            configBtn.style.animation = 'pulse 0.6s ease-in-out 3';
-                          }
-                        }, 300);
-                      }
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: '16px',
-                        height: '16px',
-                        backgroundColor: 'white',
-                        borderRadius: '50%',
-                        position: 'absolute',
-                        top: '2px',
-                        left: localNotificationSettings.discord.enabled ? '18px' : '2px',
-                        transition: 'left 0.2s',
-                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
-                      }}
-                    />
-                  </div>
+                  {/* Status indicator */}
+                  {localNotificationSettings.discord.enabled && localNotificationSettings.discord.webhookUrl && (
+                    <div style={{
+                      width: '8px',
+                      height: '8px',
+                      backgroundColor: '#10b981',
+                      borderRadius: '50%'
+                    }} />
+                  )}
                 </div>
               </div>
-            </div>
+            </BlockStack>
           </div>
           </div>
         </div>
@@ -2661,7 +2555,7 @@ export default function Index() {
                     </InlineStack>
                   </InlineStack>
 
-                  {/* Storefront Visibility Manager - Clean Horizontal Layout */}
+                  {/* Storefront Visibility Manager - Always Visible Settings */}
                   <div style={{
                     background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
                     border: '2px solid #e2e8f0',
@@ -2669,8 +2563,8 @@ export default function Index() {
                     padding: '2rem',
                     boxShadow: '0 4px 16px rgba(0, 0, 0, 0.05)'
                   }}>
-                    <BlockStack gap="400">
-                      {/* Header Section with Master Toggle */}
+                    <BlockStack gap="500">
+                      {/* Header Section */}
                       <div style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -2693,298 +2587,331 @@ export default function Index() {
                         <div style={{ 
                           display: 'flex', 
                           alignItems: 'center', 
-                          gap: '0.75rem',
-                          padding: '0.75rem 1rem',
+                          gap: '1rem',
+                          padding: '1rem',
                           background: localVisibilitySettings.enabled 
-                            ? 'rgba(16, 185, 129, 0.1)' 
-                            : 'rgba(107, 114, 128, 0.1)',
-                          borderRadius: '8px',
-                          border: localVisibilitySettings.enabled ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(107, 114, 128, 0.3)'
+                            ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)'
+                            : 'linear-gradient(135deg, rgba(107, 114, 128, 0.1) 0%, rgba(75, 85, 99, 0.05) 100%)',
+                          borderRadius: '12px',
+                          border: localVisibilitySettings.enabled ? '2px solid rgba(16, 185, 129, 0.3)' : '2px solid rgba(107, 114, 128, 0.3)'
                         }}>
-                          <Text as="span" variant="bodyMd" fontWeight="medium" 
+                          <Text as="span" variant="bodyLg" fontWeight="bold" 
                             tone={localVisibilitySettings.enabled ? 'success' : 'subdued'}>
-                            {localVisibilitySettings.enabled ? 'Active' : 'Disabled'}
+                            {localVisibilitySettings.enabled ? 'AUTOMATION ACTIVE' : 'AUTOMATION DISABLED'}
                           </Text>
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <input
-                              type="checkbox"
-                              id="visibility-master-toggle"
-                              checked={localVisibilitySettings.enabled}
-                              onChange={(e) => {
-                                const newSettings = { ...localVisibilitySettings, enabled: e.target.checked };
-                                setLocalVisibilitySettings(newSettings);
-                                handleVisibilitySettingChange('enabled', e.target.checked);
-                              }}
-                              style={{ display: 'none' }}
-                            />
-                            <label 
-                              htmlFor="visibility-master-toggle"
+                          <div
+                            style={{
+                              width: '60px',
+                              height: '32px',
+                              backgroundColor: localVisibilitySettings.enabled ? '#10b981' : '#d1d5db',
+                              borderRadius: '16px',
+                              position: 'relative',
+                              cursor: 'pointer',
+                              transition: 'all 0.3s ease',
+                              border: localVisibilitySettings.enabled ? '2px solid #059669' : '2px solid #9ca3af',
+                              boxShadow: localVisibilitySettings.enabled 
+                                ? '0 4px 12px rgba(16, 185, 129, 0.3)' 
+                                : '0 2px 8px rgba(0, 0, 0, 0.1)'
+                            }}
+                            onClick={() => {
+                              const newSettings = { ...localVisibilitySettings, enabled: !localVisibilitySettings.enabled };
+                              setLocalVisibilitySettings(newSettings);
+                              handleVisibilitySettingChange('enabled', !localVisibilitySettings.enabled);
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.transform = 'scale(1.05)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.transform = 'scale(1)';
+                            }}
+                          >
+                            <div
                               style={{
-                                width: '40px',
-                                height: '22px',
-                                backgroundColor: localVisibilitySettings.enabled ? '#059669' : '#d1d5db',
-                                borderRadius: '11px',
-                                position: 'relative',
-                                cursor: 'pointer',
+                                width: '24px',
+                                height: '24px',
+                                backgroundColor: 'white',
+                                borderRadius: '50%',
+                                position: 'absolute',
+                                top: '2px',
+                                left: localVisibilitySettings.enabled ? '32px' : '2px',
                                 transition: 'all 0.3s ease',
-                                border: 'none',
-                                display: 'inline-block'
+                                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)'
                               }}
-                            >
-                              <span
-                                style={{
-                                  width: '18px',
-                                  height: '18px',
-                                  backgroundColor: 'white',
-                                  borderRadius: '50%',
-                                  position: 'absolute',
-                                  top: '2px',
-                                  left: localVisibilitySettings.enabled ? '20px' : '2px',
-                                  transition: 'all 0.3s ease',
-                                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                                  display: 'block'
-                                }}
-                              />
-                            </label>
+                            />
                           </div>
                         </div>
                       </div>
 
-                      {/* Single Row Configuration - Alert Threshold & Visibility Rules */}
+                      {/* Settings Grid - Always Visible */}
                       <div style={{
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
-                        gap: '2rem',
-                        opacity: localVisibilitySettings.enabled ? 1 : 0.6,
-                        transition: 'all 0.3s ease'
+                        gap: '2rem'
                       }}>
-                        {/* Alert Threshold Card */}
+                        {/* Left Column - Alert Threshold */}
                         <div style={{
-                          background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+                          background: 'linear-gradient(135deg, #fef3c7 0%, #fef7cd 100%)',
                           border: '2px solid #f59e0b',
-                          borderRadius: '12px',
-                          padding: '1.5rem'
+                          borderRadius: '16px',
+                          padding: '2rem',
+                          opacity: localVisibilitySettings.enabled ? 1 : 0.6,
+                          transition: 'all 0.3s ease'
                         }}>
-                          <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            marginBottom: '1rem'
-                          }}>
+                          <BlockStack gap="400">
                             <div style={{
-                              width: '32px',
-                              height: '32px',
-                              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                              borderRadius: '8px',
                               display: 'flex',
                               alignItems: 'center',
-                              justifyContent: 'center',
-                              color: 'white',
-                              fontSize: '16px'
+                              gap: '0.75rem',
+                              marginBottom: '1rem'
                             }}>
-                              ⚠️
+                              <div style={{
+                                width: '40px',
+                                height: '40px',
+                                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                                borderRadius: '10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'white',
+                                fontSize: '20px',
+                                fontWeight: 'bold'
+                              }}>
+                                ⚠️
+                              </div>
+                              <div>
+                                <Text as="h5" variant="headingMd" fontWeight="bold">
+                                  Alert Threshold
+                                </Text>
+                                <Text as="p" variant="bodySm" tone="subdued">
+                                  Set low stock warning level
+                                </Text>
+                              </div>
                             </div>
-                            <div>
-                              <Text as="h5" variant="headingMd" fontWeight="bold">
-                                Alert Threshold
-                              </Text>
-                              <Text as="p" variant="bodySm" tone="subdued">
-                                Low stock warning level
-                              </Text>
+                            
+                            <div style={{
+                              background: 'rgba(255, 255, 255, 0.8)',
+                              borderRadius: '12px',
+                              padding: '1.5rem',
+                              border: '1px solid rgba(245, 158, 11, 0.3)'
+                            }}>
+                              <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '1rem',
+                                marginBottom: '1rem'
+                              }}>
+                                <div style={{ width: '140px' }}>
+                                  <TextField
+                                    label="Units"
+                                    type="number"
+                                    value={pendingThreshold.toString()}
+                                    onChange={handleThresholdChange}
+                                    autoComplete="off"
+                                    min={1}
+                                    max={100}
+                                    suffix="units"
+                                    placeholder="5"
+                                    disabled={!localVisibilitySettings.enabled}
+                                  />
+                                </div>
+                                <Button
+                                  onClick={confirmThreshold}
+                                  disabled={pendingThreshold === inventoryThreshold || !localVisibilitySettings.enabled}
+                                  variant="primary"
+                                  size="large"
+                                  tone={pendingThreshold !== inventoryThreshold ? "success" : undefined}
+                                >
+                                  Apply Threshold
+                                </Button>
+                              </div>
+                              
+                              <div style={{
+                                background: 'rgba(245, 158, 11, 0.1)',
+                                borderRadius: '8px',
+                                padding: '1rem',
+                                border: '1px solid rgba(245, 158, 11, 0.2)'
+                              }}>
+                                <Text as="p" variant="bodySm" fontWeight="medium">
+                                  📊 Current Setting: Products with ≤{inventoryThreshold} units will trigger low stock alerts
+                                </Text>
+                              </div>
                             </div>
-                          </div>
-                          
-                          <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '1rem',
-                            marginBottom: '1rem'
-                          }}>
-                            <div style={{ width: '100px' }}>
-                              <TextField
-                                label=""
-                                type="number"
-                                value={pendingThreshold.toString()}
-                                onChange={handleThresholdChange}
-                                autoComplete="off"
-                                min={1}
-                                max={100}
-                                suffix="units"
-                                placeholder="5"
-                                disabled={!localVisibilitySettings.enabled}
-                              />
-                            </div>
-                            <Button
-                              onClick={confirmThreshold}
-                              disabled={pendingThreshold === inventoryThreshold || !localVisibilitySettings.enabled}
-                              variant="primary"
-                              size="medium"
-                              tone={pendingThreshold !== inventoryThreshold ? "success" : undefined}
-                            >
-                              Apply
-                            </Button>
-                          </div>
-                          
-                          <div style={{
-                            background: 'rgba(245, 158, 11, 0.1)',
-                            borderRadius: '8px',
-                            padding: '0.75rem',
-                            border: '1px solid rgba(245, 158, 11, 0.2)'
-                          }}>
-                            <Text as="p" variant="bodySm" fontWeight="medium">
-                              📊 Current: ≤{inventoryThreshold} units triggers alerts
-                            </Text>
-                          </div>
+                          </BlockStack>
                         </div>
 
-                        {/* Visibility Rules Card */}
+                        {/* Right Column - Visibility Rules */}
                         <div style={{
-                          background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+                          background: 'linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%)',
                           border: '2px solid #3b82f6',
-                          borderRadius: '12px',
-                          padding: '1.5rem'
+                          borderRadius: '16px',
+                          padding: '2rem',
+                          opacity: localVisibilitySettings.enabled ? 1 : 0.6,
+                          transition: 'all 0.3s ease'
                         }}>
-                          <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            marginBottom: '1rem'
-                          }}>
-                            <div style={{
-                              width: '32px',
-                              height: '32px',
-                              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-                              borderRadius: '8px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: 'white',
-                              fontSize: '16px'
-                            }}>
-                              👁️
-                            </div>
-                            <div>
-                              <Text as="h5" variant="headingMd" fontWeight="bold">
-                                Visibility Rules
-                              </Text>
-                              <Text as="p" variant="bodySm" tone="subdued">
-                                Auto show/hide behavior
-                              </Text>
-                            </div>
-                          </div>
-                          
-                          <BlockStack gap="300">
-                            {/* Auto-Hide Rule */}
+                          <BlockStack gap="400">
                             <div style={{
                               display: 'flex',
                               alignItems: 'center',
-                              justifyContent: 'space-between',
-                              padding: '0.75rem',
-                              background: 'rgba(220, 38, 38, 0.1)',
-                              borderRadius: '8px',
-                              border: '1px solid rgba(220, 38, 38, 0.2)'
+                              gap: '0.75rem',
+                              marginBottom: '1rem'
                             }}>
                               <div style={{
+                                width: '40px',
+                                height: '40px',
+                                background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                                borderRadius: '10px',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '0.5rem'
+                                justifyContent: 'center',
+                                color: 'white',
+                                fontSize: '18px',
+                                fontWeight: 'bold'
                               }}>
-                                <span style={{ fontSize: '14px' }}>🚫</span>
-                                <Text as="p" variant="bodySm" fontWeight="bold">
-                                  Auto-Hide Out of Stock
+                                👁️
+                              </div>
+                              <div>
+                                <Text as="h5" variant="headingMd" fontWeight="bold">
+                                  Visibility Rules
+                                </Text>
+                                <Text as="p" variant="bodySm" tone="subdued">
+                                  Automatic show/hide behavior
                                 </Text>
                               </div>
-                              <div
-                                style={{
-                                  width: '40px',
-                                  height: '20px',
-                                  backgroundColor: localVisibilitySettings.hideOutOfStock ? '#dc2626' : '#d1d5db',
-                                  borderRadius: '10px',
-                                  position: 'relative',
-                                  cursor: localVisibilitySettings.enabled ? 'pointer' : 'not-allowed',
-                                  transition: 'all 0.3s ease'
-                                }}
-                                onClick={() => {
-                                  if (localVisibilitySettings.enabled) {
-                                    const newSettings = { 
-                                      ...localVisibilitySettings, 
-                                      hideOutOfStock: !localVisibilitySettings.hideOutOfStock 
-                                    };
-                                    setLocalVisibilitySettings(newSettings);
-                                    handleVisibilitySettingChange('hideOutOfStock', !localVisibilitySettings.hideOutOfStock);
-                                  }
-                                }}
-                              >
+                            </div>
+                            
+                            <div style={{
+                              background: 'rgba(255, 255, 255, 0.8)',
+                              borderRadius: '12px',
+                              padding: '1.5rem',
+                              border: '1px solid rgba(59, 130, 246, 0.3)'
+                            }}>
+                              {/* Auto-hide Out of Stock Products */}
+                              <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                padding: '1.25rem',
+                                background: 'linear-gradient(135deg, #fef2f2 0%, #fdf2f8 100%)',
+                                borderRadius: '12px',
+                                border: '2px solid #fecaca',
+                                marginBottom: '1.5rem',
+                                opacity: localVisibilitySettings.enabled ? 1 : 0.5,
+                                transition: 'all 0.3s ease'
+                              }}>
+                                <div style={{ flex: 1 }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                    <span style={{ fontSize: '16px' }}>🚫</span>
+                                    <Text as="p" variant="bodyMd" fontWeight="bold">
+                                      Auto-Hide Out of Stock Products
+                                    </Text>
+                                  </div>
+                                  <Text as="p" variant="bodySm" tone="subdued">
+                                    Automatically hide products with 0 inventory from storefront
+                                  </Text>
+                                </div>
                                 <div
                                   style={{
-                                    width: '16px',
-                                    height: '16px',
-                                    backgroundColor: 'white',
-                                    borderRadius: '50%',
-                                    position: 'absolute',
-                                    top: '2px',
-                                    left: localVisibilitySettings.hideOutOfStock ? '22px' : '2px',
+                                    width: '50px',
+                                    height: '26px',
+                                    backgroundColor: localVisibilitySettings.hideOutOfStock ? '#dc2626' : '#d1d5db',
+                                    borderRadius: '13px',
+                                    position: 'relative',
+                                    cursor: localVisibilitySettings.enabled ? 'pointer' : 'not-allowed',
                                     transition: 'all 0.3s ease',
-                                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)'
+                                    border: localVisibilitySettings.hideOutOfStock ? '2px solid #b91c1c' : '2px solid #9ca3af',
+                                    boxShadow: localVisibilitySettings.hideOutOfStock 
+                                      ? '0 2px 8px rgba(220, 38, 38, 0.3)' 
+                                      : '0 1px 4px rgba(0, 0, 0, 0.1)'
                                   }}
-                                />
+                                  onClick={() => {
+                                    if (localVisibilitySettings.enabled) {
+                                      const newSettings = { 
+                                        ...localVisibilitySettings, 
+                                        hideOutOfStock: !localVisibilitySettings.hideOutOfStock 
+                                      };
+                                      setLocalVisibilitySettings(newSettings);
+                                      handleVisibilitySettingChange('hideOutOfStock', !localVisibilitySettings.hideOutOfStock);
+                                    }
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      width: '20px',
+                                      height: '20px',
+                                      backgroundColor: 'white',
+                                      borderRadius: '50%',
+                                      position: 'absolute',
+                                      top: '1px',
+                                      left: localVisibilitySettings.hideOutOfStock ? '27px' : '1px',
+                                      transition: 'all 0.3s ease',
+                                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                                    }}
+                                  />
+                                </div>
                               </div>
-                            </div>
 
-                            {/* Auto-Show Rule */}
-                            <div style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              padding: '0.75rem',
-                              background: 'rgba(16, 185, 129, 0.1)',
-                              borderRadius: '8px',
-                              border: '1px solid rgba(16, 185, 129, 0.2)'
-                            }}>
-                              <div style={{
-                                display: 'flex',
+                              {/* Auto-show When Restocked */}
+                              <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
                                 alignItems: 'center',
-                                gap: '0.5rem'
+                                padding: '1.25rem',
+                                background: 'linear-gradient(135deg, #f0fdf4 0%, #f0f9ff 100%)',
+                                borderRadius: '12px',
+                                border: '2px solid #86efac',
+                                opacity: localVisibilitySettings.enabled ? 1 : 0.5,
+                                transition: 'all 0.3s ease'
                               }}>
-                                <span style={{ fontSize: '14px' }}>✅</span>
-                                <Text as="p" variant="bodySm" fontWeight="bold">
-                                  Auto-Show When Restocked
-                                </Text>
-                              </div>
-                              <div
-                                style={{
-                                  width: '40px',
-                                  height: '20px',
-                                  backgroundColor: localVisibilitySettings.showWhenRestocked ? '#10b981' : '#d1d5db',
-                                  borderRadius: '10px',
-                                  position: 'relative',
-                                  cursor: localVisibilitySettings.enabled ? 'pointer' : 'not-allowed',
-                                  transition: 'all 0.3s ease'
-                                }}
-                                onClick={() => {
-                                  if (localVisibilitySettings.enabled) {
-                                    const newSettings = { 
-                                      ...localVisibilitySettings, 
-                                      showWhenRestocked: !localVisibilitySettings.showWhenRestocked 
-                                    };
-                                    setLocalVisibilitySettings(newSettings);
-                                    handleVisibilitySettingChange('showWhenRestocked', !localVisibilitySettings.showWhenRestocked);
-                                  }
-                                }}
-                              >
+                                <div style={{ flex: 1 }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                    <span style={{ fontSize: '16px' }}>✅</span>
+                                    <Text as="p" variant="bodyMd" fontWeight="bold">
+                                      Auto-Show When Restocked
+                                    </Text>
+                                  </div>
+                                  <Text as="p" variant="bodySm" tone="subdued">
+                                    Automatically restore visibility when inventory is replenished
+                                  </Text>
+                                </div>
                                 <div
                                   style={{
-                                    width: '16px',
-                                    height: '16px',
-                                    backgroundColor: 'white',
-                                    borderRadius: '50%',
-                                    position: 'absolute',
-                                    top: '2px',
-                                    left: localVisibilitySettings.showWhenRestocked ? '22px' : '2px',
+                                    width: '50px',
+                                    height: '26px',
+                                    backgroundColor: localVisibilitySettings.showWhenRestocked ? '#10b981' : '#d1d5db',
+                                    borderRadius: '13px',
+                                    position: 'relative',
+                                    cursor: localVisibilitySettings.enabled ? 'pointer' : 'not-allowed',
                                     transition: 'all 0.3s ease',
-                                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)'
+                                    border: localVisibilitySettings.showWhenRestocked ? '2px solid #059669' : '2px solid #9ca3af',
+                                    boxShadow: localVisibilitySettings.showWhenRestocked 
+                                      ? '0 2px 8px rgba(16, 185, 129, 0.3)' 
+                                      : '0 1px 4px rgba(0, 0, 0, 0.1)'
                                   }}
-                                />
+                                  onClick={() => {
+                                    if (localVisibilitySettings.enabled) {
+                                      const newSettings = { 
+                                        ...localVisibilitySettings, 
+                                        showWhenRestocked: !localVisibilitySettings.showWhenRestocked 
+                                      };
+                                      setLocalVisibilitySettings(newSettings);
+                                      handleVisibilitySettingChange('showWhenRestocked', !localVisibilitySettings.showWhenRestocked);
+                                    }
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      width: '20px',
+                                      height: '20px',
+                                      backgroundColor: 'white',
+                                      borderRadius: '50%',
+                                      position: 'absolute',
+                                      top: '1px',
+                                      left: localVisibilitySettings.showWhenRestocked ? '27px' : '1px',
+                                      transition: 'all 0.3s ease',
+                                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                                    }}
+                                  />
+                                </div>
                               </div>
                             </div>
                           </BlockStack>
@@ -3000,33 +2927,43 @@ export default function Index() {
                           ? '2px solid rgba(16, 185, 129, 0.2)' 
                           : '2px solid rgba(107, 114, 128, 0.2)',
                         borderRadius: '12px',
-                        padding: '1rem'
+                        padding: '1.5rem'
                       }}>
                         <div style={{
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
+                          flexWrap: 'wrap',
                           gap: '1rem'
                         }}>
                           <div>
-                            <Text as="p" variant="bodyMd" fontWeight="bold" 
+                            <Text as="p" variant="bodyLg" fontWeight="bold" 
                               tone={localVisibilitySettings.enabled ? 'success' : 'subdued'}>
-                              📈 Status: {localVisibilitySettings.enabled 
-                                ? `Active with ${inventoryThreshold}-unit threshold. ${localVisibilitySettings.hideOutOfStock ? 'Auto-hiding' : 'Not auto-hiding'} out-of-stock products.`
-                                : 'Automation disabled. Manual control active.'
+                              📈 Current Status
+                            </Text>
+                            <Text as="p" variant="bodyMd" tone="subdued">
+                              {localVisibilitySettings.enabled 
+                                ? `Automation active with ${inventoryThreshold}-unit threshold. ${localVisibilitySettings.hideOutOfStock ? 'Auto-hiding' : 'Not auto-hiding'} out-of-stock products.`
+                                : 'Automation is disabled. Products visibility managed manually.'
                               }
                             </Text>
                           </div>
                           
                           <div style={{
-                            padding: '0.5rem 1rem',
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            borderRadius: '6px',
-                            border: '1px solid rgba(0, 0, 0, 0.1)'
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '1rem'
                           }}>
-                            <Text as="p" variant="bodySm" fontWeight="medium">
-                              💡 Use bulk edit buttons below for manual control
-                            </Text>
+                            <div style={{
+                              padding: '0.75rem 1.25rem',
+                              background: 'rgba(255, 255, 255, 0.8)',
+                              borderRadius: '8px',
+                              border: '1px solid rgba(0, 0, 0, 0.1)'
+                            }}>
+                              <Text as="p" variant="bodySm" fontWeight="bold">
+                                💡 Tip: Use bulk edit buttons in product sections below for manual control
+                              </Text>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -3343,14 +3280,31 @@ export default function Index() {
                                           </div>
                                         )}
                                       </InlineStack>
-                                      <Button
-                                        onClick={() => handleProductClick(product.id)}
-                                        variant="tertiary"
-                                        size="medium"
-                                        tone="critical"
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleProductClick(product.id);
+                                        }}
+                                        style={{
+                                          background: '#dc2626',
+                                          color: 'white',
+                                          border: 'none',
+                                          borderRadius: '4px',
+                                          padding: '0.25rem 0.5rem',
+                                          fontSize: '12px',
+                                          fontWeight: '500',
+                                          cursor: 'pointer',
+                                          transition: 'background 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          e.currentTarget.style.background = '#b91c1c';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.currentTarget.style.background = '#dc2626';
+                                        }}
                                       >
                                         Manage
-                                      </Button>
+                                      </button>
                                     </InlineStack>
                                   </BlockStack>
                                 </div>
@@ -3671,14 +3625,31 @@ export default function Index() {
                                                 </div>
                                               )}
                                             </InlineStack>
-                                            <Button
-                                              onClick={() => handleProductClick(product.id)}
-                                              variant="tertiary"
-                                              size="medium"
-                                              tone={isCritical ? "critical" : undefined}
+                                            <button
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleProductClick(product.id);
+                                              }}
+                                              style={{
+                                                background: isCritical ? '#dc2626' : '#f59e0b',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '4px',
+                                                padding: '0.25rem 0.5rem',
+                                                fontSize: '12px',
+                                                fontWeight: '500',
+                                                cursor: 'pointer',
+                                                transition: 'background 0.2s ease'
+                                              }}
+                                              onMouseEnter={(e) => {
+                                                e.currentTarget.style.background = isCritical ? '#b91c1c' : '#d97706';
+                                              }}
+                                              onMouseLeave={(e) => {
+                                                e.currentTarget.style.background = isCritical ? '#dc2626' : '#f59e0b';
+                                              }}
                                             >
                                               {isCritical ? 'Urgent' : 'Manage'}
-                                            </Button>
+                                            </button>
                                           </InlineStack>
                                         </BlockStack>
                                       </div>
@@ -3945,6 +3916,15 @@ export default function Index() {
                                   <BlockStack gap="200">
                                     <InlineStack align="space-between" blockAlign="start">
                                       <InlineStack gap="300" blockAlign="start">
+                                        {/* Selection Checkbox */}
+                                        <div style={{ flexShrink: 0, paddingTop: '0.5rem' }}>
+                                          <Checkbox 
+                                            checked={selectedProducts.has(product.id)}
+                                            onChange={() => toggleProductSelection(product.id)}
+                                            label=""
+                                          />
+                                        </div>
+                                        
                                         {/* Product Image */}
                                         <div style={{
                                           width: '60px',
@@ -4096,7 +4076,7 @@ export default function Index() {
                                     {product.stock <= 5 && (
                                       <Button
                                         onClick={() => window.open(`https://admin.shopify.com/store/${shopInfo.myshopifyDomain?.replace('.myshopify.com', '')}/products/${product.id.replace('gid://shopify/Product/', '')}`, '_blank')}
-                                        variant="tertiary"
+                                        variant="primary"
                                         size="medium"
                                         tone="critical"
                                       >

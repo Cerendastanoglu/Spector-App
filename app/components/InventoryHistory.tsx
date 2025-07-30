@@ -41,8 +41,85 @@ import {
   TransferIcon,
   ClipboardIcon,
 } from "@shopify/polaris-icons";
-import type { InventoryLogEntry, InventoryChangeType, InventorySource } from "../services/inventory-history.server";
-import { getChangeTypeInfo, getSourceInfo } from "../services/inventory-history.server";
+
+// Type definitions (moved from server file to avoid import issues)
+export interface InventoryLogEntry {
+  id: string;
+  productId: string;
+  productTitle: string;
+  variantId?: string;
+  variantTitle?: string;
+  changeType: InventoryChangeType;
+  quantityBefore: number;
+  quantityAfter: number;
+  quantityChange: number;
+  source: InventorySource;
+  userId?: string;
+  userEmail?: string;
+  timestamp: string;
+  notes?: string;
+  metadata?: any;
+}
+
+export type InventoryChangeType = 
+  | 'manual_adjustment' 
+  | 'sale_adjustment' 
+  | 'restock' 
+  | 'return_adjustment' 
+  | 'transfer_adjustment' 
+  | 'correction'
+  | 'unknown';
+
+export type InventorySource = 
+  | 'shopify_admin' 
+  | 'pos' 
+  | 'api' 
+  | 'import' 
+  | 'webhook' 
+  | 'third_party'
+  | 'manual'
+  | 'unknown';
+
+// Helper functions (moved from server to avoid import issues) 
+const getChangeTypeInfo = (changeType: InventoryChangeType) => {
+  switch (changeType) {
+    case 'manual_adjustment':
+      return { label: 'Manual Adjustment', tone: 'info' as const, icon: '✏️' };
+    case 'sale_adjustment':
+      return { label: 'Sale', tone: 'success' as const, icon: '💰' };
+    case 'restock':
+      return { label: 'Restock', tone: 'success' as const, icon: '📦' };
+    case 'return_adjustment':
+      return { label: 'Return', tone: 'warning' as const, icon: '↩️' };
+    case 'transfer_adjustment':
+      return { label: 'Transfer', tone: 'info' as const, icon: '🔄' };
+    case 'correction':
+      return { label: 'Correction', tone: 'critical' as const, icon: '🔧' };
+    default:
+      return { label: 'Unknown', tone: 'subdued' as const, icon: '❓' };
+  }
+};
+
+const getSourceInfo = (source: InventorySource) => {
+  switch (source) {
+    case 'shopify_admin':
+      return { label: 'Shopify Admin', icon: '🏪' };
+    case 'pos':
+      return { label: 'Point of Sale', icon: '🏪' };
+    case 'api':
+      return { label: 'API', icon: '⚡' };
+    case 'import':
+      return { label: 'Import', icon: '📄' };
+    case 'webhook':
+      return { label: 'Webhook', icon: '🔗' };
+    case 'third_party':
+      return { label: 'Third Party', icon: '🔌' };
+    case 'manual':
+      return { label: 'Manual Entry', icon: '✋' };
+    default:
+      return { label: 'Unknown', icon: '❓' };
+  }
+};
 
 // Icon mapping function to get the actual icon component from the icon name
 function getIconComponent(iconName: string) {
@@ -230,7 +307,7 @@ export function InventoryHistory({
       
       // Change Type
       <InlineStack gap="100" align="start" key={`change-${log.id}`}>
-        <Icon source={ChangeIcon} tone={getIconTone(changeInfo.color)} />
+        <Icon source={ChangeIcon} tone={changeInfo.tone} />
         <Text as="span">{changeInfo.label}</Text>
       </InlineStack>,
       
