@@ -2253,7 +2253,7 @@ export default function Index() {
             </div>
           </div>
           
-          {/* Notification Settings - Simple List */}
+          {/* Step 1: Low Stock Alert Threshold */}
           <div style={{
             marginTop: '1.5rem',
             padding: '1.5rem',
@@ -2263,14 +2263,114 @@ export default function Index() {
             boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
           }}>
             <div style={{ marginBottom: '1rem' }}>
-              <Text as="h4" variant="headingSm" fontWeight="semibold">
-                Notifications
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                marginBottom: '0.5rem'
+              }}>
+                <Icon source={AlertTriangleIcon} tone="warning" />
+                <Text as="h4" variant="headingSm" fontWeight="semibold">
+                  Step 1: Set Alert Threshold
+                </Text>
+                <div style={{
+                  padding: '0.25rem 0.5rem',
+                  background: 'rgba(245, 158, 11, 0.1)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(245, 158, 11, 0.3)'
+                }}>
+                  <Text as="span" variant="bodySm" fontWeight="medium">
+                    Required
+                  </Text>
+                </div>
+              </div>
+              <Text as="p" variant="bodySm" tone="subdued">
+                Set the inventory level that triggers low stock alerts
               </Text>
-              <div style={{ marginTop: '0.25rem' }}>
-                <Text as="p" variant="bodySm" tone="subdued">
-                  Configure alerts for stock changes
+            </div>
+            
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              padding: '1rem',
+              background: '#fafafa',
+              borderRadius: '8px',
+              border: '1px solid #e2e8f0'
+            }}>
+              <Text as="p" variant="bodyMd" fontWeight="medium">
+                Alert when inventory reaches:
+              </Text>
+              
+              <div style={{ width: '120px' }}>
+                <TextField
+                  label=""
+                  type="number"
+                  value={pendingThreshold.toString()}
+                  onChange={handleThresholdChange}
+                  autoComplete="off"
+                  min={1}
+                  max={100}
+                  suffix="units"
+                  placeholder="5"
+                />
+              </div>
+              <Button
+                onClick={confirmThreshold}
+                disabled={pendingThreshold === inventoryThreshold}
+                variant="primary"
+                size="medium"
+                tone={pendingThreshold !== inventoryThreshold ? "success" : undefined}
+              >
+                {pendingThreshold !== inventoryThreshold ? 'Apply' : 'Set'}
+              </Button>
+            </div>
+            
+            {/* Current Status */}
+            <div style={{
+              marginTop: '1rem',
+              padding: '0.75rem',
+              background: 'rgba(16, 185, 129, 0.05)',
+              borderRadius: '6px',
+              border: '1px solid rgba(16, 185, 129, 0.2)'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                <Icon source={CheckboxIcon} tone="success" />
+                <Text as="p" variant="bodySm" fontWeight="medium">
+                  Current threshold: {inventoryThreshold} units
                 </Text>
               </div>
+            </div>
+          </div>
+          
+          {/* Step 2: Notification Settings */}
+          <div style={{
+            marginTop: '1.5rem',
+            padding: '1.5rem',
+            background: '#ffffff',
+            borderRadius: '8px',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+          }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                marginBottom: '0.5rem'
+              }}>
+                <Icon source={EmailIcon} tone="base" />
+                <Text as="h4" variant="headingSm" fontWeight="semibold">
+                  Step 2: Configure Notifications
+                </Text>
+              </div>
+              <Text as="p" variant="bodySm" tone="subdued">
+                Choose how you want to receive alerts when inventory reaches your threshold
+              </Text>
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -2321,9 +2421,9 @@ export default function Index() {
                       marginTop: '2px' 
                     }}>
                       {localNotificationSettings.email.enabled && localNotificationSettings.email.recipientEmail
-                        ? `✓ Configured: ${localNotificationSettings.email.recipientEmail}`
+                        ? `Configured: ${localNotificationSettings.email.recipientEmail}`
                         : localNotificationSettings.email.enabled 
-                        ? '⚠️ Configuration needed'
+                        ? 'Configuration needed'
                         : 'Configure email notifications'
                       }
                     </div>
@@ -2432,9 +2532,9 @@ export default function Index() {
                       marginTop: '2px' 
                     }}>
                       {localNotificationSettings.slack.enabled && localNotificationSettings.slack.webhookUrl
-                        ? '✓ Connected to Slack workspace'
+                        ? 'Connected to Slack workspace'
                         : localNotificationSettings.slack.enabled 
-                        ? '⚠️ Configuration needed'
+                        ? 'Configuration needed'
                         : 'Configure Slack webhook'
                       }
                     </div>
@@ -2543,9 +2643,9 @@ export default function Index() {
                       marginTop: '2px' 
                     }}>
                       {localNotificationSettings.discord.enabled && localNotificationSettings.discord.webhookUrl
-                        ? '✓ Connected to Discord server'
+                        ? 'Connected to Discord server'
                         : localNotificationSettings.discord.enabled 
-                        ? '⚠️ Configuration needed'
+                        ? 'Configuration needed'
                         : 'Configure Discord webhook'
                       }
                     </div>
@@ -2610,9 +2710,126 @@ export default function Index() {
           </div>
           </div>
         </div>
-        
-        {/* Enhanced Threshold Control - Moved to Storefront Visibility Manager */}
-        {/* This section has been consolidated into the Storefront Visibility Manager below */}
+      </div>
+      
+      {/* Step 3: Storefront Visibility Settings */}
+      <div style={{
+        marginTop: '1.5rem',
+        padding: '1.5rem',
+        background: '#ffffff',
+        borderRadius: '8px',
+        border: '1px solid #e2e8f0',
+        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+      }}>
+        <BlockStack gap="400">
+          {/* Header */}
+          <div>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              marginBottom: '0.5rem'
+            }}>
+              <Icon source={ViewIcon} tone="base" />
+              <Text as="h4" variant="headingSm" fontWeight="semibold">
+                Step 3: Automatic Storefront Control
+              </Text>
+              <div style={{
+                padding: '0.25rem 0.5rem',
+                background: 'rgba(59, 130, 246, 0.1)',
+                borderRadius: '12px',
+                border: '1px solid rgba(59, 130, 246, 0.3)'
+              }}>
+                <Text as="span" variant="bodySm" fontWeight="medium">
+                  Optional
+                </Text>
+              </div>
+            </div>
+            <Text as="p" variant="bodySm" tone="subdued">
+              Automatically manage product visibility based on stock levels
+            </Text>
+          </div>
+
+          {/* Storefront Automation Toggle */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+            padding: '1rem',
+            background: '#fafafa',
+            borderRadius: '8px',
+            border: '1px solid #e2e8f0'
+          }}>
+            <Text as="p" variant="bodyMd" fontWeight="medium">
+              Auto-hide out-of-stock products:
+            </Text>
+            
+            <Text as="span" variant="bodySm" fontWeight="medium" 
+              tone={localVisibilitySettings.enabled ? 'success' : 'subdued'}>
+              {localVisibilitySettings.enabled ? 'Enabled' : 'Disabled'}
+            </Text>
+            
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <input
+                type="checkbox"
+                id="visibility-master-toggle"
+                checked={localVisibilitySettings.enabled}
+                onChange={(e) => {
+                  const newSettings = { ...localVisibilitySettings, enabled: e.target.checked };
+                  setLocalVisibilitySettings(newSettings);
+                  handleVisibilitySettingChange('enabled', e.target.checked);
+                }}
+                style={{ display: 'none' }}
+              />
+              <label 
+                htmlFor="visibility-master-toggle"
+                style={{
+                  width: '40px',
+                  height: '22px',
+                  backgroundColor: localVisibilitySettings.enabled ? '#059669' : '#d1d5db',
+                  borderRadius: '11px',
+                  position: 'relative',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  border: 'none',
+                  display: 'inline-block'
+                }}
+              >
+                <span
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    backgroundColor: 'white',
+                    borderRadius: '50%',
+                    position: 'absolute',
+                    top: '2px',
+                    left: localVisibilitySettings.enabled ? '20px' : '2px',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
+                    display: 'block'
+                  }}
+                ></span>
+              </label>
+            </div>
+          </div>
+
+          {/* Advanced Settings Link */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            paddingTop: '1rem',
+            borderTop: '1px solid #e2e8f0'
+          }}>
+            <Button
+              onClick={() => setShowVisibilitySettings(true)}
+              variant="tertiary"
+              size="medium"
+              icon={SettingsIcon}
+            >
+              Advanced Settings
+            </Button>
+          </div>
+        </BlockStack>
       </div>
       
       <BlockStack gap="500">
