@@ -9,7 +9,7 @@ import { createInventoryLog } from "../services/inventory-history.server";
  */
 export async function action({ request }: ActionFunctionArgs) {
   try {
-    const { topic, shop, session, admin } = await authenticate.webhook(request);
+    const { topic, shop } = await authenticate.webhook(request);
 
     if (topic !== "INVENTORY_LEVELS_UPDATE") {
       return json({ received: true }, { status: 200 });

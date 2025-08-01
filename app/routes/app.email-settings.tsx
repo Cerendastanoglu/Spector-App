@@ -8,7 +8,6 @@ import {
   Card,
   Button,
   BlockStack,
-  InlineStack,
   TextField,
   Checkbox,
   Banner,

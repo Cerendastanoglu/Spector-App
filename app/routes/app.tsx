@@ -1,10 +1,11 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
-import { authenticate } from "../shopify.server";
+import { authenticateSession } from "../utils/session-auth.server";
 import { InstantAlerts } from "../components/InstantAlerts";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await authenticate.admin(request);
+export const loader = async (args: LoaderFunctionArgs) => {
+  // Use optimized session token authentication
+  await authenticateSession(args);
   return null;
 };
 

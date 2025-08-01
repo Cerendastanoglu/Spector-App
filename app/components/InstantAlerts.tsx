@@ -1,35 +1,14 @@
 import { useState, useEffect } from "react";
-import { useFetcher } from "@remix-run/react";
 import {
-  Banner,
   BlockStack,
   InlineStack,
   Text,
   Button,
-  Card,
-  Badge,
   Icon,
 } from "@shopify/polaris";
 import {
   AlertTriangleIcon,
-  RefreshIcon,
-  XSmallIcon,
 } from "@shopify/polaris-icons";
-
-interface Product {
-  id: string;
-  name: string;
-  stock: number;
-  salesVelocity?: {
-    daily: number;
-    weekly: number;
-    monthly: number;
-  };
-  forecast?: {
-    daysUntilStockout: number | null;
-    status: 'critical' | 'warning' | 'safe' | 'unknown';
-  };
-}
 
 interface AlertProduct {
   id: string;
@@ -52,10 +31,7 @@ interface InstantAlert {
 
 export function InstantAlerts() {
   const [alerts, setAlerts] = useState<InstantAlert[]>([]);
-  const [lastCheck, setLastCheck] = useState<Date>(new Date());
   const [isMinimized, setIsMinimized] = useState(false);
-  
-  const fetcher = useFetcher();
 
   // Check for inventory alerts
   const checkInventoryAlerts = () => {
@@ -171,8 +147,6 @@ export function InstantAlerts() {
           return prev;
         });
       });
-      
-      setLastCheck(new Date());
     };
 
     // Initial check
@@ -202,25 +176,10 @@ export function InstantAlerts() {
     return () => clearInterval(autoDismissInterval);
   }, []);
 
-  const dismissAlert = (alertId: string) => {
-    setAlerts(prev => 
-      prev.map(alert => 
-        alert.id === alertId 
-          ? { ...alert, dismissed: true }
-          : alert
-      )
-    );
-  };
-
   const dismissAllAlerts = () => {
     setAlerts(prev => 
       prev.map(alert => ({ ...alert, dismissed: true }))
     );
-  };
-
-  const refreshAlerts = () => {
-    const newAlerts = checkInventoryAlerts();
-    setAlerts(newAlerts);
   };
 
   const activeAlerts = alerts.filter(alert => !alert.dismissed);

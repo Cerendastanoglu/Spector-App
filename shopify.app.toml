@@ -3,7 +3,7 @@
 client_id = "eb3e85d01989aa2d6f08378b8df5a312"
 name = "spector"
 handle = "spector-1"
-application_url = "https://senate-evanescence-act-specially.trycloudflare.com"
+application_url = "https://consists-active-connectivity-sl.trycloudflare.com"
 embedded = true
 
 [build]
@@ -26,7 +26,7 @@ api_version = "2025-07"
 scopes = "write_products,read_orders"
 
 [auth]
-redirect_urls = ["https://senate-evanescence-act-specially.trycloudflare.com/auth/callback", "https://senate-evanescence-act-specially.trycloudflare.com/auth/shopify/callback", "https://senate-evanescence-act-specially.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://consists-active-connectivity-sl.trycloudflare.com/auth/callback", "https://consists-active-connectivity-sl.trycloudflare.com/auth/shopify/callback", "https://consists-active-connectivity-sl.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false

@@ -1,0 +1,52 @@
+/* Product Grid Optimizations */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  /* Hardware acceleration for smooth scrolling */
+  will-change: transform;
+  contain: layout style;
+}
+
+/* Product Card Optimizations */
+.product-card {
+  /* Prevent layout shift */
+  contain: layout style;
+  /* Smooth transitions only on hover */
+  transition: box-shadow 0.15s ease;
+}
+
+.product-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Image Placeholder Optimization */
+.product-placeholder {
+  background: var(--p-color-bg-surface-secondary);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  /* Prevent layout shift */
+  aspect-ratio: 1;
+  max-width: 80px;
+}
+
+/* Performance: Reduce paint on scroll */
+.product-image {
+  contain: layout style;
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

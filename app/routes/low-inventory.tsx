@@ -1,4 +1,5 @@
-import { LoaderFunctionArgs, json } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { authenticate } from "../shopify.server";
 import { gql } from "graphql-request";
@@ -114,10 +115,6 @@ type LoaderData = {
 // --- Loader
 export async function loader({ request }: LoaderFunctionArgs) {
   const { admin } = await authenticate.admin(request);
-
-  const url = new URL(request.url);
-  const thresholdParam = url.searchParams.get("threshold");
-  const threshold = thresholdParam ? parseInt(thresholdParam, 10) : 5;
 
   const query = gql`
     query GetProductsWithInventory($first: Int!) {
@@ -271,8 +268,6 @@ export default function LowInventoryPage() {
     }[badgeType];
 
     return products.map((item, idx) => {
-      const numericId = item.productId ? item.productId.replace("gid://shopify/Product/", "") : "";
-      
       // Get forecast badge
       const getForecastDisplay = () => {
         if (!item.forecast || item.forecast.daysUntilStockout === null) {

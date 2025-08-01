@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { useFetcher } from "@remix-run/react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Card,
   BlockStack,
@@ -11,10 +10,8 @@ import {
   Banner,
   DataTable,
   Select,
-  Tooltip,
   Modal,
   List,
-  Divider,
 } from "@shopify/polaris";
 import {
   ClockIcon,
@@ -22,7 +19,6 @@ import {
   PackageIcon,
   DiscountIcon,
   ChartVerticalIcon,
-  InfoIcon,
 } from "@shopify/polaris-icons";
 
 interface Product {
@@ -67,8 +63,6 @@ export function ProductTracker({ products = [], isPublic = false }: ProductTrack
   const [selectedProduct, setSelectedProduct] = useState<StaleProduct | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [lastAnalysis, setLastAnalysis] = useState<Date>(new Date());
-  
-  const fetcher = useFetcher();
 
   // Generate AI-powered suggestions for stale products
   const generateProductSuggestions = (product: StaleProduct): ProductSuggestion[] => {
@@ -189,7 +183,7 @@ export function ProductTracker({ products = [], isPublic = false }: ProductTrack
   };
 
   // Analyze product staleness
-  const analyzeProductStaleness = () => {
+  const analyzeProductStaleness = useCallback(() => {
     const threshold = parseInt(stalenessThreshold);
     const now = new Date();
     
@@ -266,12 +260,12 @@ export function ProductTracker({ products = [], isPublic = false }: ProductTrack
     const filtered = analyzed.filter(p => p.stalenessLevel !== 'fresh');
     setStaleProducts(filtered);
     setLastAnalysis(new Date());
-  };
+  }, [stalenessThreshold, products, generateProductSuggestions]);
 
   // Initial analysis
   useEffect(() => {
     analyzeProductStaleness();
-  }, [stalenessThreshold]);
+  }, [stalenessThreshold, analyzeProductStaleness]);
 
   const getStalenessColor = (level: string) => {
     switch (level) {
@@ -280,16 +274,6 @@ export function ProductTracker({ products = [], isPublic = false }: ProductTrack
       case 'stale': return 'critical';
       case 'critical': return 'critical';
       default: return 'info';
-    }
-  };
-
-  const getStalenessIcon = (level: string) => {
-    switch (level) {
-      case 'fresh': return ChartVerticalIcon;
-      case 'aging': return ClockIcon;
-      case 'stale': return AlertTriangleIcon;
-      case 'critical': return AlertTriangleIcon;
-      default: return InfoIcon;
     }
   };
 

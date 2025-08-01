@@ -1,4 +1,3 @@
-import { authenticate } from "../shopify.server";
 import { createInventoryLog } from "../services/inventory-history.server";
 
 /**
@@ -7,35 +6,10 @@ import { createInventoryLog } from "../services/inventory-history.server";
  */
 export async function handleInventoryLevelUpdate(shop: string, inventoryData: any) {
   try {
-    const { admin } = await authenticate.admin({
-      shop,
-    } as any);
-
-    // Get product and variant information
-    const productQuery = `
-      query getProduct($id: ID!) {
-        product(id: $id) {
-          id
-          title
-          variants(first: 10) {
-            edges {
-              node {
-                id
-                title
-                inventoryQuantity
-              }
-            }
-          }
-        }
-      }
-    `;
-
     // Extract inventory level data from webhook
-    const inventoryItemId = inventoryData.inventory_item_id;
     const newQuantity = inventoryData.available;
     const locationId = inventoryData.location_id;
 
-    // You would need to map inventory_item_id to product/variant
     // This is a simplified example
     
     await createInventoryLog({

@@ -1,0 +1,7 @@
+Page,Weight,Test Type,Performance,Accessibility,Best Practices,SEO,FCP (ms),LCP (ms),TBT (ms),CLS,SI (ms),TTI (ms)
+Home,17%,Baseline,99,92,96,92,919,2222,0,0.000,1198,2222
+Home,17%,With App,99,92,96,92,938,2164,0,0.000,1347,2164
+Product,40%,Baseline,99,92,96,92,898,2093,0,0.000,992,2093
+Product,40%,With App,99,92,96,92,917,2134,0,0.000,1413,2134
+Collection,43%,Baseline,100,92,96,92,880,1641,0,0.000,961,1641
+Collection,43%,With App,99,92,96,92,911,2214,0,0.000,1271,2214

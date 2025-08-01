@@ -1,5 +1,4 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
 import {
   Page,
   Layout,
@@ -10,7 +9,6 @@ import {
   Button,
   Badge,
   Icon,
-  Divider,
   Banner,
   List,
 } from "@shopify/polaris";

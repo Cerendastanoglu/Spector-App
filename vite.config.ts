@@ -38,6 +38,10 @@ if (host === "localhost") {
 }
 
 export default defineConfig({
+  define: {
+    // Ensure process is not referenced in client code
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+  },
   server: {
     allowedHosts: [host],
     cors: {
@@ -65,9 +69,38 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   build: {
-    assetsInlineLimit: 0,
+    assetsInlineLimit: 0, // Don't inline assets to keep bundles small
+    // Tree shaking optimization
+    target: 'es2020',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console logs in production
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info'], // Remove specific console methods
+      },
+      mangle: {
+        safari10: true,
+      },
+    },
+    // CSS optimization
+    cssCodeSplit: true,
+    cssMinify: true,
   },
   optimizeDeps: {
-    include: ["@shopify/app-bridge-react", "@shopify/polaris"],
+    include: [
+      "@shopify/app-bridge-react", 
+      "@shopify/polaris"
+    ],
+    // Force pre-bundling to reduce initial load
+    force: true,
+  },
+  // CSS preprocessing for smaller bundles
+  css: {
+    postcss: {
+      plugins: [
+        // Add CSS purging and optimization plugins here if needed
+      ],
+    },
   },
 }) satisfies UserConfig;

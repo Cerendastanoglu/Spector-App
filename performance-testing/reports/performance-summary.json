@@ -1,0 +1,155 @@
+{
+  "baseline": {
+    "home": {
+      "performance": 99,
+      "accessibility": 92,
+      "bestPractices": 96,
+      "seo": 92,
+      "firstContentfulPaint": 918.836,
+      "largestContentfulPaint": 2221.7920000000004,
+      "totalBlockingTime": 0,
+      "cumulativeLayoutShift": 0,
+      "speedIndex": 1197.8701319390773,
+      "timeToInteractive": 2221.7920000000004
+    },
+    "product": {
+      "performance": 99,
+      "accessibility": 92,
+      "bestPractices": 96,
+      "seo": 92,
+      "firstContentfulPaint": 898.2305,
+      "largestContentfulPaint": 2093.133,
+      "totalBlockingTime": 0,
+      "cumulativeLayoutShift": 0,
+      "speedIndex": 991.5540749783038,
+      "timeToInteractive": 2093.133
+    },
+    "collection": {
+      "performance": 100,
+      "accessibility": 92,
+      "bestPractices": 96,
+      "seo": 92,
+      "firstContentfulPaint": 880.2370000000001,
+      "largestContentfulPaint": 1641.4002,
+      "totalBlockingTime": 0,
+      "cumulativeLayoutShift": 0,
+      "speedIndex": 960.7344819801332,
+      "timeToInteractive": 1641.4002
+    }
+  },
+  "withApp": {
+    "home": {
+      "performance": 99,
+      "accessibility": 92,
+      "bestPractices": 96,
+      "seo": 92,
+      "firstContentfulPaint": 938.1904999999999,
+      "largestContentfulPaint": 2163.585,
+      "totalBlockingTime": 0,
+      "cumulativeLayoutShift": 0,
+      "speedIndex": 1347.1957350725652,
+      "timeToInteractive": 2163.585
+    },
+    "product": {
+      "performance": 99,
+      "accessibility": 92,
+      "bestPractices": 96,
+      "seo": 92,
+      "firstContentfulPaint": 917.353,
+      "largestContentfulPaint": 2134.3169999999996,
+      "totalBlockingTime": 0,
+      "cumulativeLayoutShift": 0,
+      "speedIndex": 1412.6611439806939,
+      "timeToInteractive": 2134.3169999999996
+    },
+    "collection": {
+      "performance": 99,
+      "accessibility": 92,
+      "bestPractices": 96,
+      "seo": 92,
+      "firstContentfulPaint": 910.503,
+      "largestContentfulPaint": 2213.567,
+      "totalBlockingTime": 0,
+      "cumulativeLayoutShift": 0,
+      "speedIndex": 1271.1107739967822,
+      "timeToInteractive": 2213.567
+    }
+  },
+  "comparison": {
+    "home": {
+      "performance": {
+        "baseline": 99,
+        "withApp": 99,
+        "difference": 0,
+        "passed": true
+      },
+      "accessibility": {
+        "baseline": 92,
+        "withApp": 92,
+        "difference": 0
+      },
+      "bestPractices": {
+        "baseline": 96,
+        "withApp": 96,
+        "difference": 0
+      },
+      "seo": {
+        "baseline": 92,
+        "withApp": 92,
+        "difference": 0
+      }
+    },
+    "product": {
+      "performance": {
+        "baseline": 99,
+        "withApp": 99,
+        "difference": 0,
+        "passed": true
+      },
+      "accessibility": {
+        "baseline": 92,
+        "withApp": 92,
+        "difference": 0
+      },
+      "bestPractices": {
+        "baseline": 96,
+        "withApp": 96,
+        "difference": 0
+      },
+      "seo": {
+        "baseline": 92,
+        "withApp": 92,
+        "difference": 0
+      }
+    },
+    "collection": {
+      "performance": {
+        "baseline": 100,
+        "withApp": 99,
+        "difference": -1,
+        "passed": true
+      },
+      "accessibility": {
+        "baseline": 92,
+        "withApp": 92,
+        "difference": 0
+      },
+      "bestPractices": {
+        "baseline": 96,
+        "withApp": 96,
+        "difference": 0
+      },
+      "seo": {
+        "baseline": 92,
+        "withApp": 92,
+        "difference": 0
+      }
+    },
+    "weighted": {
+      "baseline": 99,
+      "withApp": 99,
+      "difference": 0,
+      "passed": true
+    }
+  }
+}

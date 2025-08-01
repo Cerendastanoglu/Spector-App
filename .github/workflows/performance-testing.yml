@@ -1,0 +1,198 @@
+name: Shopify App Performance Testing
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run weekly performance tests
+    - cron: '0 2 * * 1'  # Every Monday at 2 AM UTC
+  workflow_dispatch:
+    inputs:
+      shop_domain:
+        description: 'Test shop domain (without .myshopify.com)'
+        required: true
+        default: 'your-test-store'
+      run_baseline_only:
+        description: 'Run baseline test only (for new setups)'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  performance-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: performance-testing/package.json
+
+    - name: Install Chrome
+      uses: browser-actions/setup-chrome@latest
+
+    - name: Install dependencies
+      run: |
+        cd performance-testing
+        npm ci
+
+    - name: Validate shop accessibility
+      run: |
+        SHOP_DOMAIN="${{ github.event.inputs.shop_domain || secrets.TEST_SHOP_DOMAIN }}"
+        echo "Testing shop: $SHOP_DOMAIN"
+        curl -f -s "https://${SHOP_DOMAIN}.myshopify.com/" > /dev/null
+        echo "✅ Shop is accessible"
+
+    - name: Run baseline performance test
+      if: github.event.inputs.run_baseline_only == 'true'
+      run: |
+        cd performance-testing
+        SHOP_DOMAIN="${{ github.event.inputs.shop_domain || secrets.TEST_SHOP_DOMAIN }}"
+        # Create a modified script for baseline-only testing
+        node -e "
+          const tester = require('./performance-tester.js');
+          const shopTester = new tester('$SHOP_DOMAIN');
+          
+          (async () => {
+            console.log('Running baseline test only...');
+            const baseline = await shopTester.testAllPages('baseline');
+            await shopTester.saveResults();
+            console.log('Baseline test completed!');
+          })().catch(console.error);
+        "
+
+    - name: Run full performance test
+      if: github.event.inputs.run_baseline_only != 'true'
+      run: |
+        cd performance-testing
+        SHOP_DOMAIN="${{ github.event.inputs.shop_domain || secrets.TEST_SHOP_DOMAIN }}"
+        timeout 1800 ./run-performance-test.sh "$SHOP_DOMAIN" ci
+
+    - name: Parse test results
+      if: always()
+      id: results
+      run: |
+        cd performance-testing
+        if [ -d "reports_"* ]; then
+          REPORT_DIR=$(ls -d reports_* | head -1)
+          if [ -f "$REPORT_DIR/performance-summary.json" ]; then
+            # Extract results using jq
+            WEIGHTED_DIFF=$(jq -r '.comparison.weighted.difference // "N/A"' "$REPORT_DIR/performance-summary.json")
+            PASSED=$(jq -r '.comparison.weighted.passed // false' "$REPORT_DIR/performance-summary.json")
+            
+            echo "weighted_diff=$WEIGHTED_DIFF" >> $GITHUB_OUTPUT
+            echo "passed=$PASSED" >> $GITHUB_OUTPUT
+            echo "report_dir=$REPORT_DIR" >> $GITHUB_OUTPUT
+            
+            # Create summary for GitHub
+            if [ "$PASSED" = "true" ]; then
+              echo "status=✅ PASSED" >> $GITHUB_OUTPUT
+              echo "## 🎯 Performance Test Results" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "✅ **PASSED** - Your app meets Shopify App Store requirements!" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "**Weighted Performance Change:** $WEIGHTED_DIFF points" >> $GITHUB_STEP_SUMMARY
+              echo "**Requirement:** Maximum -10 points allowed" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "status=❌ FAILED" >> $GITHUB_OUTPUT
+              echo "## 🎯 Performance Test Results" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "❌ **FAILED** - Your app needs optimization!" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "**Weighted Performance Change:** $WEIGHTED_DIFF points" >> $GITHUB_STEP_SUMMARY
+              echo "**Requirement:** Maximum -10 points allowed" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "### 💡 Next Steps:" >> $GITHUB_STEP_SUMMARY
+              echo "1. Review detailed reports in artifacts" >> $GITHUB_STEP_SUMMARY
+              echo "2. Optimize bundle size (<10KB JS, <50KB CSS)" >> $GITHUB_STEP_SUMMARY
+              echo "3. Implement lazy loading for non-critical features" >> $GITHUB_STEP_SUMMARY
+              echo "4. Use session tokens instead of cookies" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "status=⚠️ INCOMPLETE" >> $GITHUB_OUTPUT
+            echo "No summary results found" >> $GITHUB_STEP_SUMMARY
+          fi
+        else
+          echo "status=⚠️ NO REPORTS" >> $GITHUB_OUTPUT
+          echo "No report directories found" >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Upload performance reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-reports-${{ github.run_number }}
+        path: performance-testing/reports_*
+        retention-days: 30
+
+    - name: Upload CSV results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-csv-${{ github.run_number }}
+        path: performance-testing/reports_*/performance-results.csv
+        retention-days: 90
+
+    - name: Comment on PR
+      if: github.event_name == 'pull_request' && always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const status = '${{ steps.results.outputs.status }}';
+          const weightedDiff = '${{ steps.results.outputs.weighted_diff }}';
+          const passed = '${{ steps.results.outputs.passed }}';
+          
+          let comment = `## 📊 Shopify App Performance Test Results\n\n`;
+          
+          if (passed === 'true') {
+            comment += `✅ **PASSED** - Your app meets Shopify App Store requirements!\n\n`;
+            comment += `**Performance Impact:** ${weightedDiff} points (within -10 point limit)\n\n`;
+            comment += `🎉 Great job! Your app is ready for the Shopify App Store.\n`;
+          } else if (passed === 'false') {
+            comment += `❌ **FAILED** - Your app needs performance optimization\n\n`;
+            comment += `**Performance Impact:** ${weightedDiff} points (exceeds -10 point limit)\n\n`;
+            comment += `### 💡 Optimization Recommendations:\n`;
+            comment += `- Reduce bundle sizes (<10KB JS, <50KB CSS)\n`;
+            comment += `- Implement lazy loading for non-critical components\n`;
+            comment += `- Use session tokens instead of cookies\n`;
+            comment += `- Optimize GraphQL queries\n\n`;
+            comment += `📁 Check the artifacts for detailed Lighthouse reports.\n`;
+          } else {
+            comment += `⚠️ **INCOMPLETE** - Test results unavailable\n\n`;
+            comment += `Please check the workflow logs for more details.\n`;
+          }
+          
+          comment += `\n---\n*Performance testing powered by Lighthouse*`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+    - name: Fail workflow if performance test failed
+      if: steps.results.outputs.passed == 'false'
+      run: |
+        echo "❌ Performance test failed - app does not meet Shopify requirements"
+        echo "Performance impact: ${{ steps.results.outputs.weighted_diff }} points"
+        echo "Maximum allowed: -10 points"
+        exit 1
+
+    - name: Success notification
+      if: steps.results.outputs.passed == 'true'
+      run: |
+        echo "✅ Performance test passed!"
+        echo "Performance impact: ${{ steps.results.outputs.weighted_diff }} points"
+        echo "Your app meets Shopify App Store requirements! 🎉"
