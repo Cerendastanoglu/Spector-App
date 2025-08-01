@@ -37,6 +37,9 @@ import {
   ViewIcon,
   HideIcon,
   RefreshIcon,
+  SettingsIcon,
+  NotificationIcon,
+  ExternalIcon,
 } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
@@ -145,6 +148,93 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('out-of-stock');
   const [sortBy, setSortBy] = useState('stock-asc');
+  
+  // Comprehensive Notification Settings State
+  const [notificationConfig, setNotificationConfig] = useState({
+    // Thresholds
+    thresholds: {
+      lowStock: 5,
+      critical: 0,
+      veryLowStock: 2,
+      customThreshold: 10,
+    },
+    
+    // Email Settings
+    email: {
+      enabled: true,
+      address: '',
+      scenarios: {
+        outOfStock: true,
+        lowStock: true,
+        veryLowStock: true,
+        stockReplenished: false,
+        newProducts: false,
+        priceChanges: false,
+        dailyReport: false,
+        weeklyReport: true,
+        monthlyReport: false,
+        customThresholdReached: false,
+      },
+      frequency: 'immediate', // immediate, hourly, daily
+    },
+    
+    // Slack Settings
+    slack: {
+      enabled: false,
+      webhookUrl: '',
+      channel: '#inventory',
+      scenarios: {
+        outOfStock: false,
+        lowStock: false,
+        veryLowStock: false,
+        stockReplenished: false,
+        newProducts: false,
+        priceChanges: false,
+        dailyReport: false,
+        weeklyReport: false,
+        monthlyReport: false,
+        customThresholdReached: false,
+      },
+      frequency: 'immediate',
+    },
+    
+    // Discord Settings
+    discord: {
+      enabled: false,
+      webhookUrl: '',
+      channel: 'inventory-alerts',
+      scenarios: {
+        outOfStock: false,
+        lowStock: false,
+        veryLowStock: false,
+        stockReplenished: false,
+        newProducts: false,
+        priceChanges: false,
+        dailyReport: false,
+        weeklyReport: false,
+        monthlyReport: false,
+        customThresholdReached: false,
+      },
+      frequency: 'immediate',
+    },
+    
+    // Advanced Settings
+    advanced: {
+      quietHours: {
+        enabled: false,
+        startTime: '22:00',
+        endTime: '08:00',
+        timezone: 'UTC',
+      },
+      grouping: {
+        enabled: true,
+        timeWindow: 15, // minutes
+        maxGroupSize: 10,
+      },
+      businessDaysOnly: false,
+      minimumStockValue: 0, // Only alert for products above this value
+    },
+  });
 
   // Calculate basic metrics
   const outOfStock = products.filter((p: any) => p.stock === 0).length;
@@ -325,7 +415,7 @@ export default function Dashboard() {
         </div>
       </Card>
 
-      {/* Notification Settings Panel */}
+      {/* Advanced Notification Settings Panel */}
       {showNotificationSettings && (
         <div style={{ marginTop: '1rem' }}>
           <Card>
@@ -335,99 +425,619 @@ export default function Dashboard() {
               transition={{duration: '200ms', timingFunction: 'ease-in-out'}}
             >
               <div style={{ padding: '1.5rem', borderTop: '2px solid #dc2626' }}>
-                <BlockStack gap="400">
+                <BlockStack gap="600">
+                  {/* Header */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text as="h2" variant="headingMd" fontWeight="semibold">
-                      Notification Settings
-                    </Text>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Icon source={NotificationIcon} tone="base" />
+                      <Text as="h2" variant="headingLg" fontWeight="bold">
+                        Advanced Notification Settings
+                      </Text>
+                    </div>
                     <Button variant="tertiary" onClick={toggleNotificationSettings}>
                       Close
                     </Button>
                   </div>
                   
+                  {/* Thresholds Section */}
+                  <Card background="bg-surface-secondary">
+                    <div style={{ padding: '1rem' }}>
+                      <BlockStack gap="400">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <Icon source={SettingsIcon} tone="base" />
+                          <Text as="h3" variant="headingMd" fontWeight="semibold">
+                            Alert Thresholds
+                          </Text>
+                        </div>
+                        
+                        <Layout>
+                          <Layout.Section variant="oneHalf">
+                            <TextField
+                              label="Critical (Out of Stock)"
+                              type="number"
+                              value={notificationConfig.thresholds.critical.toString()}
+                              onChange={(value) => setNotificationConfig(prev => ({
+                                ...prev,
+                                thresholds: { ...prev.thresholds, critical: parseInt(value) || 0 }
+                              }))}
+                              helpText="Immediate alerts when stock reaches this level"
+                              autoComplete="off"
+                            />
+                          </Layout.Section>
+                          
+                          <Layout.Section variant="oneHalf">
+                            <TextField
+                              label="Very Low Stock"
+                              type="number"
+                              value={notificationConfig.thresholds.veryLowStock.toString()}
+                              onChange={(value) => setNotificationConfig(prev => ({
+                                ...prev,
+                                thresholds: { ...prev.thresholds, veryLowStock: parseInt(value) || 0 }
+                              }))}
+                              helpText="Urgent warnings"
+                              autoComplete="off"
+                            />
+                          </Layout.Section>
+                          
+                          <Layout.Section>
+                            <TextField
+                              label="Low Stock Warning"
+                              type="number"
+                              value={notificationConfig.thresholds.lowStock.toString()}
+                              onChange={(value) => setNotificationConfig(prev => ({
+                                ...prev,
+                                thresholds: { ...prev.thresholds, lowStock: parseInt(value) || 0 }
+                              }))}
+                              helpText="Early warning alerts"
+                              autoComplete="off"
+                            />
+                          </Layout.Section>
+                          
+                          <Layout.Section>
+                            <TextField
+                              label="Custom Threshold"
+                              type="number"
+                              value={notificationConfig.thresholds.customThreshold.toString()}
+                              onChange={(value) => setNotificationConfig(prev => ({
+                                ...prev,
+                                thresholds: { ...prev.thresholds, customThreshold: parseInt(value) || 0 }
+                              }))}
+                              helpText="Your custom alert level"
+                              autoComplete="off"
+                            />
+                          </Layout.Section>
+                        </Layout>
+                      </BlockStack>
+                    </div>
+                  </Card>
+                  
+                  {/* Notification Channels */}
                   <Layout>
+                    {/* Email Configuration */}
                     <Layout.Section variant="oneThird">
                       <Card>
-                        <div style={{ padding: '1rem' }}>
-                          <BlockStack gap="300">
-                            <div style={{ textAlign: 'center' }}>
-                              <Icon source={EmailIcon} />
-                              <Text as="h3" variant="headingSm" fontWeight="medium">
-                                Email Alerts
+                        <div style={{ padding: '1.5rem' }}>
+                          <BlockStack gap="400">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <Icon source={EmailIcon} tone={notificationConfig.email.enabled ? 'success' : 'subdued'} />
+                              <Text as="h3" variant="headingMd" fontWeight="semibold">
+                                Email Notifications
                               </Text>
+                              <div style={{ marginLeft: 'auto' }}>
+                                <Checkbox
+                                  label=""
+                                  checked={notificationConfig.email.enabled}
+                                  onChange={(checked) => setNotificationConfig(prev => ({
+                                    ...prev,
+                                    email: { ...prev.email, enabled: checked }
+                                  }))}
+                                />
+                              </div>
                             </div>
-                            <BlockStack gap="200">
-                              <Checkbox label="Out of stock alerts" checked />
-                              <Checkbox label="Low stock warnings" checked />
-                              <Checkbox label="Daily reports" />
-                            </BlockStack>
-                            <Button variant="primary" fullWidth size="slim">
-                              Configure Email
-                            </Button>
+                            
+                            {notificationConfig.email.enabled && (
+                              <BlockStack gap="300">
+                                <TextField
+                                  label="Email Address"
+                                  type="email"
+                                  value={notificationConfig.email.address}
+                                  onChange={(value) => setNotificationConfig(prev => ({
+                                    ...prev,
+                                    email: { ...prev.email, address: value }
+                                  }))}
+                                  placeholder="alerts@yourbusiness.com"
+                                  autoComplete="email"
+                                />
+                                
+                                <Select
+                                  label="Notification Frequency"
+                                  options={[
+                                    {label: 'Immediate', value: 'immediate'},
+                                    {label: 'Hourly Digest', value: 'hourly'},
+                                    {label: 'Daily Digest', value: 'daily'},
+                                  ]}
+                                  value={notificationConfig.email.frequency}
+                                  onChange={(value) => setNotificationConfig(prev => ({
+                                    ...prev,
+                                    email: { ...prev.email, frequency: value }
+                                  }))}
+                                />
+                                
+                                <Text as="h4" variant="headingSm" fontWeight="medium">
+                                  Alert Scenarios
+                                </Text>
+                                
+                                <BlockStack gap="200">
+                                  <Checkbox
+                                    label="🚨 Out of Stock (Critical)"
+                                    checked={notificationConfig.email.scenarios.outOfStock}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      email: { ...prev.email, scenarios: { ...prev.email.scenarios, outOfStock: checked }}
+                                    }))}
+                                  />
+                                  <Checkbox
+                                    label="⚠️ Very Low Stock"
+                                    checked={notificationConfig.email.scenarios.veryLowStock}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      email: { ...prev.email, scenarios: { ...prev.email.scenarios, veryLowStock: checked }}
+                                    }))}
+                                  />
+                                  <Checkbox
+                                    label="🔶 Low Stock Warning"
+                                    checked={notificationConfig.email.scenarios.lowStock}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      email: { ...prev.email, scenarios: { ...prev.email.scenarios, lowStock: checked }}
+                                    }))}
+                                  />
+                                  <Checkbox
+                                    label="✅ Stock Replenished"
+                                    checked={notificationConfig.email.scenarios.stockReplenished}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      email: { ...prev.email, scenarios: { ...prev.email.scenarios, stockReplenished: checked }}
+                                    }))}
+                                  />
+                                  <Checkbox
+                                    label="🆕 New Products Added"
+                                    checked={notificationConfig.email.scenarios.newProducts}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      email: { ...prev.email, scenarios: { ...prev.email.scenarios, newProducts: checked }}
+                                    }))}
+                                  />
+                                  <Checkbox
+                                    label="💰 Price Changes"
+                                    checked={notificationConfig.email.scenarios.priceChanges}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      email: { ...prev.email, scenarios: { ...prev.email.scenarios, priceChanges: checked }}
+                                    }))}
+                                  />
+                                  <Checkbox
+                                    label="🎯 Custom Threshold Reached"
+                                    checked={notificationConfig.email.scenarios.customThresholdReached}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      email: { ...prev.email, scenarios: { ...prev.email.scenarios, customThresholdReached: checked }}
+                                    }))}
+                                  />
+                                </BlockStack>
+                                
+                                <Text as="h4" variant="headingSm" fontWeight="medium">
+                                  Reports
+                                </Text>
+                                
+                                <BlockStack gap="200">
+                                  <Checkbox
+                                    label="📊 Daily Reports"
+                                    checked={notificationConfig.email.scenarios.dailyReport}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      email: { ...prev.email, scenarios: { ...prev.email.scenarios, dailyReport: checked }}
+                                    }))}
+                                  />
+                                  <Checkbox
+                                    label="📈 Weekly Reports"
+                                    checked={notificationConfig.email.scenarios.weeklyReport}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      email: { ...prev.email, scenarios: { ...prev.email.scenarios, weeklyReport: checked }}
+                                    }))}
+                                  />
+                                  <Checkbox
+                                    label="📋 Monthly Reports"
+                                    checked={notificationConfig.email.scenarios.monthlyReport}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      email: { ...prev.email, scenarios: { ...prev.email.scenarios, monthlyReport: checked }}
+                                    }))}
+                                  />
+                                </BlockStack>
+                              </BlockStack>
+                            )}
                           </BlockStack>
                         </div>
                       </Card>
                     </Layout.Section>
-
+                    
+                    {/* Slack Configuration */}
                     <Layout.Section variant="oneThird">
                       <Card>
-                        <div style={{ padding: '1rem' }}>
-                          <BlockStack gap="300">
-                            <div style={{ textAlign: 'center' }}>
-                              <Icon source={ViewIcon} />
-                              <Text as="h3" variant="headingSm" fontWeight="medium">
+                        <div style={{ padding: '1.5rem' }}>
+                          <BlockStack gap="400">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <div style={{
+                                width: '24px',
+                                height: '24px',
+                                background: '#4A154B',
+                                borderRadius: '4px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'white',
+                                fontSize: '12px',
+                                fontWeight: 'bold'
+                              }}>
+                                S
+                              </div>
+                              <Text as="h3" variant="headingMd" fontWeight="semibold">
                                 Slack Integration
                               </Text>
+                              <div style={{ marginLeft: 'auto' }}>
+                                <Checkbox
+                                  label=""
+                                  checked={notificationConfig.slack.enabled}
+                                  onChange={(checked) => setNotificationConfig(prev => ({
+                                    ...prev,
+                                    slack: { ...prev.slack, enabled: checked }
+                                  }))}
+                                />
+                              </div>
                             </div>
-                            <div style={{ textAlign: 'center', padding: '1rem', background: '#f8fafc', borderRadius: '6px' }}>
-                              <Text as="p" variant="bodySm" tone="subdued">
-                                Not connected
-                              </Text>
-                            </div>
-                            <Button variant="primary" fullWidth size="slim">
-                              Connect Slack
-                            </Button>
+                            
+                            {notificationConfig.slack.enabled ? (
+                              <BlockStack gap="300">
+                                <TextField
+                                  label="Slack Webhook URL"
+                                  type="url"
+                                  value={notificationConfig.slack.webhookUrl}
+                                  onChange={(value) => setNotificationConfig(prev => ({
+                                    ...prev,
+                                    slack: { ...prev.slack, webhookUrl: value }
+                                  }))}
+                                  placeholder="https://hooks.slack.com/services/..."
+                                  helpText="Get this from your Slack app settings"
+                                  autoComplete="off"
+                                />
+                                
+                                <TextField
+                                  label="Channel"
+                                  value={notificationConfig.slack.channel}
+                                  onChange={(value) => setNotificationConfig(prev => ({
+                                    ...prev,
+                                    slack: { ...prev.slack, channel: value }
+                                  }))}
+                                  placeholder="#inventory-alerts"
+                                  autoComplete="off"
+                                />
+                                
+                                <Text as="h4" variant="headingSm" fontWeight="medium">
+                                  Slack Notifications
+                                </Text>
+                                
+                                <BlockStack gap="200">
+                                  <Checkbox
+                                    label="🚨 Critical Stock Alerts"
+                                    checked={notificationConfig.slack.scenarios.outOfStock}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      slack: { ...prev.slack, scenarios: { ...prev.slack.scenarios, outOfStock: checked }}
+                                    }))}
+                                  />
+                                  <Checkbox
+                                    label="⚠️ Low Stock Warnings"
+                                    checked={notificationConfig.slack.scenarios.lowStock}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      slack: { ...prev.slack, scenarios: { ...prev.slack.scenarios, lowStock: checked }}
+                                    }))}
+                                  />
+                                  <Checkbox
+                                    label="📊 Daily Reports"
+                                    checked={notificationConfig.slack.scenarios.dailyReport}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      slack: { ...prev.slack, scenarios: { ...prev.slack.scenarios, dailyReport: checked }}
+                                    }))}
+                                  />
+                                  <Checkbox
+                                    label="🆕 New Products"
+                                    checked={notificationConfig.slack.scenarios.newProducts}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      slack: { ...prev.slack, scenarios: { ...prev.slack.scenarios, newProducts: checked }}
+                                    }))}
+                                  />
+                                </BlockStack>
+                                
+                                <Button variant="primary" fullWidth>
+                                  Test Slack Connection
+                                </Button>
+                              </BlockStack>
+                            ) : (
+                              <div style={{ textAlign: 'center', padding: '2rem', background: '#f8fafc', borderRadius: '8px' }}>
+                                <BlockStack gap="300">
+                                  <Text as="p" variant="bodyMd" tone="subdued">
+                                    Connect Slack to receive real-time inventory alerts in your workspace
+                                  </Text>
+                                  <Button variant="primary" onClick={() => setNotificationConfig(prev => ({
+                                    ...prev,
+                                    slack: { ...prev.slack, enabled: true }
+                                  }))}>
+                                    Enable Slack Notifications
+                                  </Button>
+                                </BlockStack>
+                              </div>
+                            )}
                           </BlockStack>
                         </div>
                       </Card>
                     </Layout.Section>
-
+                    
+                    {/* Discord Configuration */}
                     <Layout.Section variant="oneThird">
                       <Card>
-                        <div style={{ padding: '1rem' }}>
-                          <BlockStack gap="300">
-                            <div style={{ textAlign: 'center' }}>
-                              <Icon source={InfoIcon} />
-                              <Text as="h3" variant="headingSm" fontWeight="medium">
-                                Thresholds
+                        <div style={{ padding: '1.5rem' }}>
+                          <BlockStack gap="400">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <div style={{
+                                width: '24px',
+                                height: '24px',
+                                background: '#5865F2',
+                                borderRadius: '4px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'white',
+                                fontSize: '12px',
+                                fontWeight: 'bold'
+                              }}>
+                                D
+                              </div>
+                              <Text as="h3" variant="headingMd" fontWeight="semibold">
+                                Discord Integration
                               </Text>
+                              <div style={{ marginLeft: 'auto' }}>
+                                <Checkbox
+                                  label=""
+                                  checked={notificationConfig.discord.enabled}
+                                  onChange={(checked) => setNotificationConfig(prev => ({
+                                    ...prev,
+                                    discord: { ...prev.discord, enabled: checked }
+                                  }))}
+                                />
+                              </div>
                             </div>
-                            <BlockStack gap="200">
-                              <TextField
-                                label="Low Stock"
-                                type="number"
-                                value="5"
-                                onChange={() => {}}
-                                autoComplete="off"
-                                size="slim"
-                              />
-                              <TextField
-                                label="Critical"
-                                type="number"
-                                value="0"
-                                onChange={() => {}}
-                                autoComplete="off"
-                                size="slim"
-                              />
-                            </BlockStack>
-                            <Button variant="primary" fullWidth size="slim">
-                              Save Changes
-                            </Button>
+                            
+                            {notificationConfig.discord.enabled ? (
+                              <BlockStack gap="300">
+                                <TextField
+                                  label="Discord Webhook URL"
+                                  type="url"
+                                  value={notificationConfig.discord.webhookUrl}
+                                  onChange={(value) => setNotificationConfig(prev => ({
+                                    ...prev,
+                                    discord: { ...prev.discord, webhookUrl: value }
+                                  }))}
+                                  placeholder="https://discord.com/api/webhooks/..."
+                                  helpText="Get this from your Discord server settings"
+                                  autoComplete="off"
+                                />
+                                
+                                <TextField
+                                  label="Channel Name"
+                                  value={notificationConfig.discord.channel}
+                                  onChange={(value) => setNotificationConfig(prev => ({
+                                    ...prev,
+                                    discord: { ...prev.discord, channel: value }
+                                  }))}
+                                  placeholder="inventory-alerts"
+                                  autoComplete="off"
+                                />
+                                
+                                <Text as="h4" variant="headingSm" fontWeight="medium">
+                                  Discord Notifications
+                                </Text>
+                                
+                                <BlockStack gap="200">
+                                  <Checkbox
+                                    label="🚨 Critical Stock Alerts"
+                                    checked={notificationConfig.discord.scenarios.outOfStock}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      discord: { ...prev.discord, scenarios: { ...prev.discord.scenarios, outOfStock: checked }}
+                                    }))}
+                                  />
+                                  <Checkbox
+                                    label="⚠️ Low Stock Warnings"
+                                    checked={notificationConfig.discord.scenarios.lowStock}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      discord: { ...prev.discord, scenarios: { ...prev.discord.scenarios, lowStock: checked }}
+                                    }))}
+                                  />
+                                  <Checkbox
+                                    label="📊 Daily Reports"
+                                    checked={notificationConfig.discord.scenarios.dailyReport}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      discord: { ...prev.discord, scenarios: { ...prev.discord.scenarios, dailyReport: checked }}
+                                    }))}
+                                  />
+                                  <Checkbox
+                                    label="🆕 New Products"
+                                    checked={notificationConfig.discord.scenarios.newProducts}
+                                    onChange={(checked) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      discord: { ...prev.discord, scenarios: { ...prev.discord.scenarios, newProducts: checked }}
+                                    }))}
+                                  />
+                                </BlockStack>
+                                
+                                <Button variant="primary" fullWidth>
+                                  Test Discord Connection
+                                </Button>
+                              </BlockStack>
+                            ) : (
+                              <div style={{ textAlign: 'center', padding: '2rem', background: '#f8fafc', borderRadius: '8px' }}>
+                                <BlockStack gap="300">
+                                  <Text as="p" variant="bodyMd" tone="subdued">
+                                    Connect Discord to receive inventory notifications in your server
+                                  </Text>
+                                  <Button variant="primary" onClick={() => setNotificationConfig(prev => ({
+                                    ...prev,
+                                    discord: { ...prev.discord, enabled: true }
+                                  }))}>
+                                    Enable Discord Notifications
+                                  </Button>
+                                </BlockStack>
+                              </div>
+                            )}
                           </BlockStack>
                         </div>
                       </Card>
                     </Layout.Section>
                   </Layout>
+                  
+                  {/* Advanced Settings */}
+                  <Card background="bg-surface-secondary">
+                    <div style={{ padding: '1.5rem' }}>
+                      <BlockStack gap="400">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <Icon source={SettingsIcon} tone="base" />
+                          <Text as="h3" variant="headingMd" fontWeight="semibold">
+                            Advanced Notification Settings
+                          </Text>
+                        </div>
+                        
+                        <Layout>
+                          <Layout.Section variant="oneHalf">
+                            <BlockStack gap="300">
+                              <Text as="h4" variant="headingSm" fontWeight="medium">
+                                Quiet Hours
+                              </Text>
+                              <Checkbox
+                                label="Enable quiet hours (no notifications during specified times)"
+                                checked={notificationConfig.advanced.quietHours.enabled}
+                                onChange={(checked) => setNotificationConfig(prev => ({
+                                  ...prev,
+                                  advanced: { 
+                                    ...prev.advanced, 
+                                    quietHours: { ...prev.advanced.quietHours, enabled: checked }
+                                  }
+                                }))}
+                              />
+                              
+                              {notificationConfig.advanced.quietHours.enabled && (
+                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                  <TextField
+                                    label="Start Time"
+                                    type="time"
+                                    value={notificationConfig.advanced.quietHours.startTime}
+                                    onChange={(value) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      advanced: { 
+                                        ...prev.advanced, 
+                                        quietHours: { ...prev.advanced.quietHours, startTime: value }
+                                      }
+                                    }))}
+                                    autoComplete="off"
+                                  />
+                                  <TextField
+                                    label="End Time"
+                                    type="time"
+                                    value={notificationConfig.advanced.quietHours.endTime}
+                                    onChange={(value) => setNotificationConfig(prev => ({
+                                      ...prev,
+                                      advanced: { 
+                                        ...prev.advanced, 
+                                        quietHours: { ...prev.advanced.quietHours, endTime: value }
+                                      }
+                                    }))}
+                                    autoComplete="off"
+                                  />
+                                </div>
+                              )}
+                            </BlockStack>
+                          </Layout.Section>
+                          
+                          <Layout.Section variant="oneHalf">
+                            <BlockStack gap="300">
+                              <Text as="h4" variant="headingSm" fontWeight="medium">
+                                Notification Grouping
+                              </Text>
+                              <Checkbox
+                                label="Group similar notifications to reduce spam"
+                                checked={notificationConfig.advanced.grouping.enabled}
+                                onChange={(checked) => setNotificationConfig(prev => ({
+                                  ...prev,
+                                  advanced: { 
+                                    ...prev.advanced, 
+                                    grouping: { ...prev.advanced.grouping, enabled: checked }
+                                  }
+                                }))}
+                              />
+                              
+                              <Checkbox
+                                label="Send notifications only on business days"
+                                checked={notificationConfig.advanced.businessDaysOnly}
+                                onChange={(checked) => setNotificationConfig(prev => ({
+                                  ...prev,
+                                  advanced: { ...prev.advanced, businessDaysOnly: checked }
+                                }))}
+                              />
+                              
+                              <TextField
+                                label="Minimum product value for alerts ($)"
+                                type="number"
+                                value={notificationConfig.advanced.minimumStockValue.toString()}
+                                onChange={(value) => setNotificationConfig(prev => ({
+                                  ...prev,
+                                  advanced: { ...prev.advanced, minimumStockValue: parseFloat(value) || 0 }
+                                }))}
+                                helpText="Only alert for products above this value"
+                                autoComplete="off"
+                              />
+                            </BlockStack>
+                          </Layout.Section>
+                        </Layout>
+                      </BlockStack>
+                    </div>
+                  </Card>
+                  
+                  {/* Save Settings */}
+                  <div style={{ 
+                    display: 'flex', 
+                    gap: '1rem', 
+                    justifyContent: 'flex-end',
+                    padding: '1rem',
+                    borderTop: '1px solid #e5e7eb'
+                  }}>
+                    <Button variant="secondary" onClick={toggleNotificationSettings}>
+                      Cancel
+                    </Button>
+                    <Button variant="primary" onClick={() => {
+                      // Save notification settings
+                      console.log('Saving notification settings:', notificationConfig);
+                      // Here you would typically call an API to save the settings
+                      toggleNotificationSettings();
+                    }}>
+                      Save All Settings
+                    </Button>
+                  </div>
                 </BlockStack>
               </div>
             </Collapsible>

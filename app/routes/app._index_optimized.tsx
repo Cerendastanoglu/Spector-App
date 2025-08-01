@@ -8,4 +8,4 @@
 // 6. Removed heavy order data fetching by default
 // 7. Pre-compiled regex patterns for category detection
 
-export { loader, action, default } from "./app._index";
+export { loader, default } from "./app._index";
